@@ -1,9 +1,10 @@
-QT += qml quick
+QT += qml quick bluetooth
 
 CONFIG += c++11
 
 SOURCES += \
-    src/main.cpp
+    src/main.cpp \
+    src/device.cpp
 
 RESOURCES += qml/qml.qrc
 
@@ -30,3 +31,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES +=
+
+HEADERS += \
+    src/device.h
