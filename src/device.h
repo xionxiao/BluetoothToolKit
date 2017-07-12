@@ -14,6 +14,7 @@ class Device : public QObject
     Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
     Q_PROPERTY(QString address READ getAddress NOTIFY addressChanged)
     Q_PROPERTY(int rssi READ getRssi NOTIFY rssiChanged)
+    friend class DeviceManager;
 
 public:
     explicit Device(const QBluetoothDeviceInfo &d, QObject* parent=0);

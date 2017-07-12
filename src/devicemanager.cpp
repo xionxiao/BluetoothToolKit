@@ -2,9 +2,6 @@
 #include <QBluetoothLocalDevice>
 #include <QMetaEnum>
 #include "utils.h"
-#include "scaleservice.h"
-#include "dfuservice.h"
-
 using namespace utils;
 
 #define DEVICE_DISCOVERY_TIMEOUT 5000
@@ -142,26 +139,6 @@ QObject* DeviceManager::connectToDevice(Device *d)
     // find and create scale service or dfu service
     for (int i=0; i<l.length(); i++) {
         Log.d() << i << l[i];
-        if (l[i] == ScaleService::SCALE_SERVICE_UUID) {
-            QLowEnergyService *service = m_controller->createServiceObject(l[i]);
-            if (!service && service->state() != INVALID_SERVICE) {
-                emitError(CONNECT_ERROR, "Service create error");
-                return NULL;
-            }
-            m_connected_service = new ScaleService(service);
-            connect((Service*)m_connected_service, SIGNAL(serviceConnected()), this, SIGNAL(serviceConnected()));
-            return m_connected_service;
-        }
-        if (l[i] == DfuService::DFU_SERVICE_UUID) {
-            QLowEnergyService *service = m_controller->createServiceObject(l[i]);
-            if (!service) {
-                emitError(CONNECT_ERROR, "service create error");
-                return NULL;
-            }
-            m_connected_service = new DfuService(service);
-            connect((Service*)m_connected_service, SIGNAL(serviceConnected()), this, SIGNAL(serviceConnected()));
-            return m_connected_service;
-        }
     }
 
     // can't find scale service or dfu service
@@ -176,9 +153,5 @@ void DeviceManager::disconnectFromDevice()
         m_controller->disconnectFromDevice();
         delete m_controller;
         m_controller = NULL;
-    }
-    if (m_connected_service) {
-        //delete m_connected_service;
-        //m_connected_service = NULL;
     }
 }

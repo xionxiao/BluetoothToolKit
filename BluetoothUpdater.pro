@@ -4,7 +4,9 @@ CONFIG += c++11
 
 SOURCES += \
     src/main.cpp \
-    src/device.cpp
+    src/device.cpp \
+    src/devicemanager.cpp \
+    src/utils.cpp
 
 RESOURCES += qml/qml.qrc
 
@@ -33,4 +35,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES +=
 
 HEADERS += \
-    src/device.h
+    src/device.h \
+    src/devicemanager.h \
+    src/utils.h
