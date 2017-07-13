@@ -8,6 +8,7 @@ ApplicationWindow {
     height: 420
     title: qsTr("Bluetooth")
 
+    /*
     SwipeView {
         id: swipeView
         anchors.fill: parent
@@ -21,9 +22,20 @@ ApplicationWindow {
             }
         }
     }
+    */
+    GroupBox {
+        width: 400
+        height: 320
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.topMargin: 20
+        anchors.rightMargin: 20
+    }
 
+    /*
     footer: TabBar {
         id: tabBar
+        /*
         currentIndex: swipeView.currentIndex
         TabButton {
             text: qsTr("Device")
@@ -31,5 +43,8 @@ ApplicationWindow {
         TabButton {
             text: qsTr("About")
         }
+        */
+    /*
     }
+    */
 }
