@@ -4,9 +4,9 @@ import QtQuick.Layouts 1.3
 
 ApplicationWindow {
     visible: true
-    width: 640
-    height: 480
-    title: qsTr("Hello World")
+    width: 680
+    height: 420
+    title: qsTr("Bluetooth")
 
     SwipeView {
         id: swipeView
