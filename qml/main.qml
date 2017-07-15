@@ -16,16 +16,15 @@ ApplicationWindow {
 
         Image {
             id: image
-            width: 100
             height: 200
             clip: true
-            fillMode: Image.Stretch
+            fillMode: Image.PreserveAspectFit
             Layout.fillHeight: false
             Layout.fillWidth: false
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: 8
-            source: ""
+            source: "Bluetooth.jpg"
         }
 
         Text {
@@ -59,9 +58,10 @@ ApplicationWindow {
     }
 
     Frame {
+        id: device_frame
         x: 260
-        width: 400
-        height: 320
+        width: parent.width - 260 - 20
+        height: parent.height - 100
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.topMargin: 20
@@ -99,8 +99,10 @@ ApplicationWindow {
 
     Button {
         id: button
-        x: 540
-        y: 350
+        anchors.top: device_frame.bottom
+        anchors.topMargin: 10
+        anchors.right: parent.right
+        anchors.rightMargin: 20
         width: 120
         height: 36
         text: qsTr("Refresh")
@@ -110,8 +112,10 @@ ApplicationWindow {
 
     CheckBox {
         id: checkbox
-        y: 350
-        x: 260
+        anchors.left: device_frame.left
+        anchors.leftMargin: -8
+        anchors.top: device_frame.bottom
+        anchors.topMargin: 10
         height: 36
         text: qsTr("display all devices")
         checked: true
