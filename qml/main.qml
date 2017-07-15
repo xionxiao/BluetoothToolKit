@@ -1,4 +1,4 @@
-import QtQuick 2.9
+import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
 import QtQuick.Controls.Material 2.2
@@ -8,6 +8,55 @@ ApplicationWindow {
     width: 680
     height: 420
     title: qsTr("Bluetooth")
+
+    Item {
+        id: left_panel
+        width: 260
+        height: 420
+
+        Image {
+            id: image
+            width: 100
+            height: 200
+            clip: true
+            fillMode: Image.Stretch
+            Layout.fillHeight: false
+            Layout.fillWidth: false
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: 8
+            source: ""
+        }
+
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: 210
+            text: qsTr("Bluetooth: On")
+            font.bold: true
+        }
+
+        Button {
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: 230
+            width: 120
+            height: 36
+            text: qsTr("Firmware")
+            font.capitalization: Font.MixedCase
+            highlighted: true
+        }
+
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: 270
+            text: qsTr("Now discoverable as")
+        }
+
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: 300
+            text: qsTr("\"Allen\"")
+        }
+    }
 
     Frame {
         x: 260
@@ -46,9 +95,9 @@ ApplicationWindow {
         id: button
         x: 550
         y: 360
-        width: 100
+        width: 120
         height: 36
-        text: qsTr("firmware")
+        text: qsTr("Refresh")
         font.capitalization: Font.MixedCase
         highlighted: true
     }
