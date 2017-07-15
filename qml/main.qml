@@ -58,7 +58,7 @@ ApplicationWindow {
     }
 
     Frame {
-        id: device_frame
+        id: frame
         x: 260
         width: parent.width - 260 - 20
         height: parent.height - 100
@@ -69,6 +69,7 @@ ApplicationWindow {
         padding: 0
 
         Item {
+            id: header
             anchors.top: parent.top
             width: parent.width
             height: 24
@@ -95,11 +96,51 @@ ApplicationWindow {
                 color: Material.frameColor
             }
         }
+
+        ListView {
+            id: listView
+            width: parent.width
+            height: parent.height - 24
+            clip: true
+            anchors.top: header.bottom
+            highlightMoveDuration: 1
+            highlightRangeMode: ListView.StrictlyEnforceRange
+            delegate: Item {
+                width: parent.width
+                height: 48
+                Image {
+                    width: 48
+                    height: 48
+                    anchors.verticalCenter: parent.verticalAlignment
+                    anchors.left: parent.left
+                    anchors.leftMargin: 5
+                    source: "Bluetooth.jpg"
+                    fillMode: Image.PreserveAspectFit
+                }
+
+                Text {
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.leftMargin: 48 + 5
+                    width: parent.width
+                    height: 24
+                    text: modelData
+                }
+                Text {
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.leftMargin: 48 + 5
+                    height: 24
+                    text: "no description"
+                }
+            }
+            model: ["device1","device2","device3"]
+        }
     }
 
     Button {
         id: button
-        anchors.top: device_frame.bottom
+        anchors.top: frame.bottom
         anchors.topMargin: 10
         anchors.right: parent.right
         anchors.rightMargin: 20
@@ -112,9 +153,9 @@ ApplicationWindow {
 
     CheckBox {
         id: checkbox
-        anchors.left: device_frame.left
+        anchors.left: frame.left
         anchors.leftMargin: -8
-        anchors.top: device_frame.bottom
+        anchors.top: frame.bottom
         anchors.topMargin: 10
         height: 36
         text: qsTr("display all devices")
