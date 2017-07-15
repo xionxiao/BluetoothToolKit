@@ -82,6 +82,12 @@ ApplicationWindow {
                 font.bold: true
             }
 
+            BusyIndicator {
+                anchors.right: parent.right
+                width: 24
+                height:24
+            }
+
             Rectangle {
                 anchors.bottom: parent.bottom
                 height: 1
@@ -93,12 +99,21 @@ ApplicationWindow {
 
     Button {
         id: button
-        x: 550
-        y: 360
+        x: 540
+        y: 350
         width: 120
         height: 36
         text: qsTr("Refresh")
         font.capitalization: Font.MixedCase
         highlighted: true
+    }
+
+    CheckBox {
+        id: checkbox
+        y: 350
+        x: 260
+        height: 36
+        text: qsTr("display all devices")
+        checked: true
     }
 }
