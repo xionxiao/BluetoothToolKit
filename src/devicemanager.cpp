@@ -104,15 +104,16 @@ QObject* DeviceManager::connectToDevice(Device *d)
     //TODO: compare current connected device and new device
     Log.d() << "connect to device: " << d->name;
 
-    // Disconnect first
-    disconnectFromDevice();
-
-    Log.d() << "Connecting";
+    // Check info is valid
     QBluetoothDeviceInfo info = d->getInfo();
     if(!info.isValid()) {
         emitError(CONNECT_ERROR, "device is not valid");
         return NULL;
     }
+
+    // Disconnect first
+    disconnectFromDevice();
+
     m_controller = new QLowEnergyController(info, this);
     m_controller->connectToDevice();
     Log.d() << "connect to device " << info.name();

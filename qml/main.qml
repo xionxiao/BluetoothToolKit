@@ -1,13 +1,14 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
-import QtQuick.Controls.Material 2.2
+import QtQuick.Controls.Material 2.0
 
 ApplicationWindow {
     visible: true
     width: 680
     height: 420
     title: qsTr("Bluetooth")
+    property var deviceManager: DeviceManager
 
     Item {
         id: left_panel
@@ -124,7 +125,7 @@ ApplicationWindow {
                     anchors.leftMargin: 48 + 5
                     width: parent.width
                     height: 24
-                    text: modelData
+                    text: modelData.name
                 }
                 Text {
                     anchors.bottom: parent.bottom
@@ -134,7 +135,7 @@ ApplicationWindow {
                     text: "no description"
                 }
             }
-            model: ["device1","device2","device3"]
+            model: deviceManager.deviceList
         }
     }
 
@@ -160,5 +161,9 @@ ApplicationWindow {
         height: 36
         text: qsTr("display all devices")
         checked: true
+    }
+
+    Component.onCompleted: {
+        deviceManager.scan()
     }
 }
