@@ -85,6 +85,7 @@ ApplicationWindow {
             }
 
             BusyIndicator {
+                id: busy_indicator
                 anchors.right: parent.right
                 width: 24
                 height:24
@@ -118,21 +119,27 @@ ApplicationWindow {
                     source: "Bluetooth.jpg"
                     fillMode: Image.PreserveAspectFit
                 }
-
-                Text {
+                Item {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.leftMargin: 48 + 5
                     width: parent.width
                     height: 24
-                    text: modelData.name
+                    Text {
+                        anchors.bottom: parent.bottom
+                        text: modelData.name
+                    }
                 }
-                Text {
+                Item {
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.leftMargin: 48 + 5
                     height: 24
-                    text: "no description"
+                    Text {
+                        anchors.top: parent.top
+                        text: modelData.uuid
+                        color: "gray"
+                    }
                 }
             }
             model: deviceManager.deviceList
@@ -140,7 +147,7 @@ ApplicationWindow {
     }
 
     Button {
-        id: button
+        id: refresh_button
         anchors.top: frame.bottom
         anchors.topMargin: 10
         anchors.right: parent.right
@@ -150,6 +157,11 @@ ApplicationWindow {
         text: qsTr("Refresh")
         font.capitalization: Font.MixedCase
         highlighted: true
+        enabled: false
+        onClicked: {
+            deviceManager.scan()
+            busy_indicator.running = true
+        }
     }
 
     CheckBox {
@@ -164,6 +176,14 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
+        refresh_button.enabled = true
         deviceManager.scan()
+    }
+
+    Connections {
+        target: deviceManager
+        onUpdated: {
+            busy_indicator.running = false
+        }
     }
 }

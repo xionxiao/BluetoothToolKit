@@ -6,8 +6,13 @@ Device::Device(const QBluetoothDeviceInfo &info, QObject* parent) : QObject(pare
 {
     name = info.name();
     rssi = info.rssi();
-    address = info.address().toString();
+#ifdef Q_OS_MAC
     uuid = info.deviceUuid().toString();
+    address = uuid;
+#else
+    address = info.address().toString();
+    uuid = address;
+#endif
 }
 
 QString Device::getUuid() const
