@@ -21,23 +21,3 @@ bool utils::waitForEvent(const QObject *sender, const char *signal, uint timeout
         return false;
     }
 }
-
-QDebug utils::LogClass::d()
-{
-    return qDebug();
-}
-
-QDebug utils::LogClass::e()
-{
-    return qCritical();
-}
-
-QDebug utils::LogClass::i()
-{
-    return qInfo();
-}
-
-QDebug utils::LogClass::w()
-{
-    return qWarning();
-}

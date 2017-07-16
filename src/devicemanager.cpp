@@ -44,18 +44,15 @@ QString DeviceManager::getLastError()
 {
     QMetaEnum metaEnum = QMetaEnum::fromType<DeviceManager::ErrorCode>();
     QString error_code = metaEnum.valueToKey(m_last_error);
-    Log.d() << error_code;
     return error_code + "|" + m_error_string;
 }
 
 void DeviceManager::onScanFinished()
 {
     QList<QBluetoothDeviceInfo> l = m_agent->discoveredDevices();
-    Log.d() << "discovered devices" << l.length();
     qDeleteAll(m_devices);
     m_devices.clear();
     for (int i=0; i<l.length(); i++) {
-        Log.d() << l.at(i).deviceUuid() << l.at(i).name() << l.at(i).address() << int(l.at(i).serviceClasses());
         for (uint j=0; j<sizeof(m_name_filter)/sizeof(m_name_filter[0]); j++) {
             if (l.at(i).name() == m_name_filter[j]) {
                 Device* d = new Device(l.at(i));
@@ -76,13 +73,11 @@ void DeviceManager::emitError(ErrorCode error_code, QString error_string)
 {
     m_last_error = error_code;
     m_error_string = error_string;
-    Log.d() << "----" << error_code << error_string << "----";
     emit error(error_code, error_string);
 }
 
 void DeviceManager::stop()
 {
-    Log.d() << "scan stopped";
     if (m_agent->isActive()) {
         m_agent->stop();
     }
@@ -90,7 +85,6 @@ void DeviceManager::stop()
 
 void DeviceManager::scan()
 {
-    Log.d() << "scan start";
     m_agent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
 }
 
@@ -102,7 +96,6 @@ QVariant DeviceManager::getDeviceList()
 QObject* DeviceManager::connectToDevice(Device *d)
 {
     //TODO: compare current connected device and new device
-    Log.d() << "connect to device: " << d->name;
 
     // Check info is valid
     QBluetoothDeviceInfo info = d->getInfo();
@@ -116,13 +109,11 @@ QObject* DeviceManager::connectToDevice(Device *d)
 
     m_controller = new QLowEnergyController(info, this);
     m_controller->connectToDevice();
-    Log.d() << "connect to device " << info.name();
     if (!waitForEvent(m_controller, SIGNAL(connected()))) {
         emitError(TIMEOUT, "Timeout");
         return NULL;
     }
 
-    Log.d() << "Connected " << m_controller->ConnectedState;
     // discover service
     m_controller->discoverServices();
     if (!waitForEvent(m_controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), SERVICE_DISCOVERY_TIMEOUT)) {
@@ -137,11 +128,6 @@ QObject* DeviceManager::connectToDevice(Device *d)
         return NULL;
     }
 
-    // find and create scale service or dfu service
-    for (int i=0; i<l.length(); i++) {
-        Log.d() << i << l[i];
-    }
-
     // can't find scale service or dfu service
     emitError(CONNECT_ERROR, "no proper service found");
     return NULL;
@@ -149,7 +135,6 @@ QObject* DeviceManager::connectToDevice(Device *d)
 
 void DeviceManager::disconnectFromDevice()
 {
-    Log.d() << "disconnect";
     if (m_controller) {
         m_controller->disconnectFromDevice();
         delete m_controller;
