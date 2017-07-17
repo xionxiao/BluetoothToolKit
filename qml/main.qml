@@ -107,16 +107,19 @@ ApplicationWindow {
             anchors.top: header.bottom
             highlightMoveDuration: 1
             highlightRangeMode: ListView.StrictlyEnforceRange
-            delegate: Item {
+            delegate: Rectangle {
+                id: delegate_item
                 width: parent.width
                 height: 48
+                color: ListView.isCurrentItem ? Material.color(Material.Blue) : "transparent"
+                property bool highlighted: ListView.isCurrentItem
                 Image {
                     width: 48
                     height: 48
                     anchors.verticalCenter: parent.verticalAlignment
                     anchors.left: parent.left
                     anchors.leftMargin: 5
-                    source: "Bluetooth.jpg"
+                    source: "Bluetooth.png"
                     fillMode: Image.PreserveAspectFit
                 }
                 Item {
@@ -128,6 +131,8 @@ ApplicationWindow {
                     Text {
                         anchors.bottom: parent.bottom
                         text: modelData.name
+                        font.bold: highlighted
+                        color: highlighted ? "white" : "black"
                     }
                 }
                 Item {
@@ -138,7 +143,13 @@ ApplicationWindow {
                     Text {
                         anchors.top: parent.top
                         text: modelData.uuid
-                        color: "gray"
+                        color: highlighted ? "white" : "gray"
+                    }
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        listView.currentIndex = highlighted ? -1 : index
                     }
                 }
             }
