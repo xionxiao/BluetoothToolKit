@@ -4,5 +4,6 @@
         <file>qtquickcontrols2.conf</file>
         <file>Bluetooth.jpg</file>
         <file>Bluetooth.png</file>
+        <file>download.png</file>
     </qresource>
 </RCC>

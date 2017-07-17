@@ -105,8 +105,6 @@ ApplicationWindow {
             height: parent.height - 24
             clip: true
             anchors.top: header.bottom
-            highlightMoveDuration: 1
-            highlightRangeMode: ListView.StrictlyEnforceRange
             delegate: Rectangle {
                 id: delegate_item
                 width: parent.width
@@ -150,6 +148,27 @@ ApplicationWindow {
                     anchors.fill: parent
                     onClicked: {
                         listView.currentIndex = highlighted ? -1 : index
+                    }
+                }
+                Button {
+                    id: download_button
+                    visible: parent.highlighted
+                    anchors.right: parent.right
+                    height: 48
+                    width: 48
+                    contentItem: Image {
+                        anchors.centerIn: parent
+                        width: 18
+                        height: 18
+                        source: "download.png"
+                        fillMode: Image.PreserveAspectFit
+                    }
+                    background: Rectangle {
+                        anchors.centerIn: parent
+                        color: download_button.down ? Material.color(Material.Green) : "transparent"
+                        width: 36
+                        height: 36
+                        radius: 24
                     }
                 }
             }
