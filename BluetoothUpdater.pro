@@ -6,7 +6,8 @@ SOURCES += \
     src/main.cpp \
     src/device.cpp \
     src/devicemanager.cpp \
-    src/utils.cpp
+    src/utils.cpp \
+    src/service.cpp
 
 RESOURCES += qml/qml.qrc
 
@@ -37,4 +38,6 @@ DISTFILES +=
 HEADERS += \
     src/device.h \
     src/devicemanager.h \
-    src/utils.h
+    src/utils.h \
+    src/service.h \
+    src/service.h
