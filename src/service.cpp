@@ -11,12 +11,6 @@ Service::Service(QLowEnergyService* service)
 
 Service::~Service()
 {
-    /*
-    if (m_service) {
-        delete m_service;
-        m_service = NULL;
-    }
-    */
 }
 
 void Service::setupService(QLowEnergyService* service)
