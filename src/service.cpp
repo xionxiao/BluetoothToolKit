@@ -16,6 +16,7 @@ Service::~Service()
 void Service::setupService(QLowEnergyService* service)
 {
     m_service = service;
+    // TODO: check service state
     if (m_service != 0 ) {
         // handle Service State changes
         connect(m_service, SIGNAL(stateChanged(QLowEnergyService::ServiceState)),
@@ -38,6 +39,11 @@ void Service::setupService(QLowEnergyService* service)
 QLowEnergyService* Service::getService()
 {
     return m_service;
+}
+
+bool Service::isValid()
+{
+    return m_service && m_service->state() == SERVICE_DISCOVERED;
 }
 
 void Service::emitError(int error_code, QString error_string)
@@ -111,6 +117,10 @@ void Service::write(QLowEnergyCharacteristic &c, QByteArray &bytes, QLowEnergySe
         emitError(CHARACTOR_ERROR, "write charactor is not valid");
         return;
     }
+    if (!this->isValid()) {
+        emitError(SERVICE_ERROR, "service is not valid");
+        return;
+    }
     m_service->writeCharacteristic(c, bytes, mode);
 }
 
@@ -119,6 +129,10 @@ bool Service::readSync(QLowEnergyCharacteristic &c, QByteArray &bs, uint timeout
 {
     if(!c.isValid()) {
         emitError(CHARACTOR_ERROR, "read charactor is not valid");
+        return false;
+    }
+    if (!this->isValid()) {
+        emitError(SERVICE_ERROR, "service is not valid");
         return false;
     }
     m_service->readCharacteristic(c);

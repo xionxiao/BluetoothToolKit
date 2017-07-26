@@ -114,10 +114,13 @@ QObject* DeviceManager::connectToDevice(Device *d)
         return NULL;
     }
 
+    // emit device connect before service create
+    emit deviceConnected();
+
     // discover service
     m_controller->discoverServices();
     if (!waitForEvent(m_controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), SERVICE_DISCOVERY_TIMEOUT)) {
-        emitError(TIMEOUT, "Service discovery timeout");
+        emitError(TIMEOUT, "Service discovery timeout " + SERVICE_DISCOVERY_TIMEOUT);
         return NULL;
     }
 
@@ -128,16 +131,34 @@ QObject* DeviceManager::connectToDevice(Device *d)
         return NULL;
     }
 
-    // can't find scale service or dfu service
-    emitError(CONNECT_ERROR, "no proper service found");
-    return NULL;
+    //TODO: add filter, filter out certain service to connect
+    // can't find proper service
+    // emitError(CONNECT_ERROR, "no proper service found");
+    // return NULL;
+
+    QLowEnergyService *service = m_controller->createServiceObject(l[0]);
+    if (!service) {
+        emitError(CONNECT_ERROR, "service create error");
+        return NULL;
+    }
+    //TODO: create and connect dfu service
+    m_connected_service = new Service(service);
+    return m_connected_service;
 }
 
 void DeviceManager::disconnectFromDevice()
 {
     if (m_controller) {
         m_controller->disconnectFromDevice();
+        if (!waitForEvent(m_controller, SIGNAL(disconnected()))) {
+            emit(TIMEOUT, "Service disconnect timeout");
+            return;
+        }
         delete m_controller;
         m_controller = NULL;
+        delete m_connected_service;
+        // TODO: add dummy service to prevent null operation
+        m_connected_service = NULL;
+        emit deviceDisconnected();
     }
 }

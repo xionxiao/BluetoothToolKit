@@ -5,6 +5,7 @@
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <QLowEnergyController>
 #include "device.h"
+#include "service.h"
 
 class DeviceManager : public QObject
 {
@@ -20,8 +21,8 @@ public:
 signals:
     void updated();
     void stopped();
-    void serviceConnected();
-    void serviceDisconnected();
+    void deviceConnected();
+    void deviceDisconnected();
     void error(int errorCode, QString errorString);
 
 public slots:
@@ -48,6 +49,7 @@ private:
     static const QString m_name_filter[];
     ErrorCode m_last_error = NOERROR;
     QString m_error_string;
+    Service *m_connected_service = 0;
 };
 
 #endif // DEVICEMANAGER_H

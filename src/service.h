@@ -22,6 +22,7 @@ public:
     Q_ENUM(ErrorCode)
 
 Q_SIGNALS:
+    // notify from charactor, should not be used outside.
     void notify(const QString name, const QByteArray data);
     void error(int errorCode, QString errorString);
     void serviceConnected();
@@ -30,6 +31,7 @@ Q_SIGNALS:
 protected:
     void setupService(QLowEnergyService* service);
     QLowEnergyService* getService();
+    bool isValid();
 
     virtual void onConnected() { emit serviceConnected(); }
     virtual void onDisconnected() { emit serviceDisconnected(); }
