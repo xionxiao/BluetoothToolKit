@@ -7,7 +7,8 @@ SOURCES += \
     src/device.cpp \
     src/devicemanager.cpp \
     src/utils.cpp \
-    src/service.cpp
+    src/service.cpp \
+    src/dfuservice.cpp
 
 RESOURCES += qml/qml.qrc
 
@@ -40,4 +41,5 @@ HEADERS += \
     src/devicemanager.h \
     src/utils.h \
     src/service.h \
-    src/service.h
+    src/service.h \
+    src/dfuservice.h
