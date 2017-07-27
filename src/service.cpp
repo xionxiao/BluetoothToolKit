@@ -46,7 +46,7 @@ bool Service::isValid()
     return m_service && m_service->state() == SERVICE_DISCOVERED;
 }
 
-void Service::emitError(int error_code, QString error_string)
+void Service::emitError(ErrorCode error_code, QString error_string)
 {
     m_last_error = error_code;
     m_error_string = error_string;

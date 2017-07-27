@@ -57,7 +57,7 @@ protected slots:
     void processNotification(QLowEnergyCharacteristic, QByteArray);
     void processStateChanged(QLowEnergyService::ServiceState state);
     void processServiceError(QLowEnergyService::ServiceError error);
-    void emitError(int error_code, QString error_string);
+    void emitError(ErrorCode error_code, QString error_string);
 
 protected:
     QLowEnergyService *m_service;

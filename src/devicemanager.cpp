@@ -143,6 +143,7 @@ QObject* DeviceManager::connectToDevice(Device *d)
     }
     //TODO: create and connect dfu service
     m_connected_service = new Service(service);
+    connect((Service*)m_connected_service, SIGNAL(serviceConnected()), this, SIGNAL(serviceConnected()));
     return m_connected_service;
 }
 

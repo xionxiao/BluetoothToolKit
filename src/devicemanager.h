@@ -23,6 +23,8 @@ signals:
     void stopped();
     void deviceConnected();
     void deviceDisconnected();
+    void serviceConnected();
+    void seviceDisconnected();
     void error(int errorCode, QString errorString);
 
 public slots:
