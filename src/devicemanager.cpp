@@ -156,9 +156,11 @@ void DeviceManager::disconnectFromDevice()
         }
         delete m_controller;
         m_controller = NULL;
-        delete m_connected_service;
-        // TODO: add dummy service to prevent null operation
-        m_connected_service = NULL;
-        emit deviceDisconnected();
-    }
+	}
+	if (m_connected_service) {
+		delete m_connected_service;
+		// TODO: add dummy service to prevent null operation
+		m_connected_service = NULL;
+	}
+	emit deviceDisconnected();
 }
