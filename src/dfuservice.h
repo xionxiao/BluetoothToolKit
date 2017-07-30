@@ -27,7 +27,7 @@ protected:
 
 public slots:
     virtual QString type() { return QString("Bootloader"); }
-    void update(QString filename);
+    void update();
 
 private slots:
     void startDfu();
