@@ -11,6 +11,7 @@ Service::Service(QLowEnergyService* service)
 
 Service::~Service()
 {
+    Log.d() << "~Service";
 }
 
 void Service::setupService(QLowEnergyService* service)

@@ -120,7 +120,7 @@ QObject* DeviceManager::connectToDevice(Device *d)
     // discover service
     m_controller->discoverServices();
     if (!waitForEvent(m_controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), SERVICE_DISCOVERY_TIMEOUT)) {
-        emitError(TIMEOUT, "Service discovery timeout " + SERVICE_DISCOVERY_TIMEOUT);
+        emitError(TIMEOUT, "Service discovery timeout " + QString(SERVICE_DISCOVERY_TIMEOUT));
         return NULL;
     }
 
@@ -152,7 +152,7 @@ void DeviceManager::disconnectFromDevice()
     if (m_controller) {
         m_controller->disconnectFromDevice();
         if (!waitForEvent(m_controller, SIGNAL(disconnected()))) {
-            emit(TIMEOUT, "Service disconnect timeout");
+            emitError(TIMEOUT, "Service disconnect timeout");
             return;
         }
         delete m_controller;
