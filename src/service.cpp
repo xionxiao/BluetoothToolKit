@@ -1,6 +1,7 @@
 #include "service.h"
 #include "utils.h"
 #include <QMetaEnum>
+#include <QQmlEngine>
 using namespace utils;
 
 
@@ -16,9 +17,14 @@ Service::~Service()
 
 void Service::setupService(QLowEnergyService* service)
 {
+    // Set object ownership to C++ not QML to manage Service lifecycle.
+    // @link {http://doc.qt.io/qt-5/qqmlengine.html#ObjectOwnership-enum}
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     m_service = service;
+
     // TODO: check service state
     if (m_service != 0 ) {
+
         // handle Service State changes
         connect(m_service, SIGNAL(stateChanged(QLowEnergyService::ServiceState)),
                 this, SLOT(processStateChanged(QLowEnergyService::ServiceState)));
@@ -42,15 +48,11 @@ QLowEnergyService* Service::getService()
     return m_service;
 }
 
-bool Service::isValid()
-{
-    return m_service && m_service->state() == SERVICE_DISCOVERED;
-}
-
 void Service::emitError(ErrorCode error_code, QString error_string)
 {
     m_last_error = error_code;
     m_error_string = error_string;
+    Log.d() << "----" << error_code << error_string << "----";
     emit error(error_code, error_string);
 }
 
@@ -72,13 +74,17 @@ void Service::processStateChanged(QLowEnergyService::ServiceState state)
 {
     m_prev_state = m_state;
     m_state = state;
+    Log.d() << "service state changed: " << m_prev_state << " -> " << m_state;
     if (m_state == DISCOVERY_REQUIRED) {
+        Log.d() << "discover required";
         m_service->discoverDetails();
     }
     if (m_prev_state == DISCOVERING_SERVICES && m_state == SERVICE_DISCOVERED) {
+        Log.d() << "service::connected";
         onConnected();
     }
     if (m_prev_state == SERVICE_DISCOVERED && m_state != SERVICE_DISCOVERED) {
+        Log.d() << "service::disconnected";
         onDisconnected();
     }
 }
@@ -98,10 +104,14 @@ QByteArray Service::readNotificationValue(QLowEnergyCharacteristic &c)
 bool Service::readNotificationValueSync(QLowEnergyCharacteristic &c, QByteArray &bs, uint timeout)
 {
     if (waitForEvent(this, SIGNAL(notify(QString, QByteArray)), timeout)) {
-        bs = m_notification_data[c.name()];
-        return true;
+        if (c.isValid()) {
+            bs = m_notification_data[c.name()];
+            return true;
+        } else {
+            emitError(CHARACTOR_ERROR, "readNotificationValueSync inValid Charactor");
+        }
     }
-    emitError(TIMEOUT, "readNotificationValueSync timeout");
+    emitError(TIMEOUT, "readNotificationValueSync timeout ");
     return false;
 }
 
@@ -138,10 +148,15 @@ bool Service::readSync(QLowEnergyCharacteristic &c, QByteArray &bs, uint timeout
     }
     m_service->readCharacteristic(c);
     if (waitForEvent(m_service, SIGNAL(characteristicRead(QLowEnergyCharacteristic,QByteArray)), timeout)) {
-        bs = c.value();
-        return true;
+        if(!c.isValid()) {
+            emitError(CHARACTOR_ERROR, "read charactor is not valid");
+            return false;
+        } else {
+            bs = c.value();
+            return true;
+        }
     } else {
-        emitError(TIMEOUT, "read synchronously timeout");
+        emitError(TIMEOUT, "read synchronously timeout" + QString(timeout));
         return false;
     }
 }

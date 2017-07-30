@@ -31,14 +31,13 @@ Q_SIGNALS:
 protected:
     void setupService(QLowEnergyService* service);
     QLowEnergyService* getService();
-    bool isValid();
 
     virtual void onConnected() { emit serviceConnected(); }
     virtual void onDisconnected() { emit serviceDisconnected(); }
 
 public slots:
     virtual QString type() { return QString("Generic"); }
-    bool ready() { return m_service && m_service->state() == QLowEnergyService::ServiceState::ServiceDiscovered; }
+    bool isValid() { return m_service && m_service->state() == SERVICE_DISCOVERED; }
     QString getLastError();
 
 protected slots:
