@@ -1,11 +1,14 @@
 #include "devicemanager.h"
 #include <QBluetoothLocalDevice>
 #include <QMetaEnum>
+#include <QQmlEngine>
 #include "utils.h"
+#include "dfuservice.h"
+
 using namespace utils;
 
 #define DEVICE_DISCOVERY_TIMEOUT 5000
-#define SERVICE_DISCOVERY_TIMEOUT 30000
+#define SERVICE_DISCOVERY_TIMEOUT 10000
 
 const QString DeviceManager::m_name_filter[] = {"eScale", "boot"};
 
@@ -34,10 +37,10 @@ DeviceManager::~DeviceManager()
 bool DeviceManager::isValid()
 {
     QBluetoothLocalDevice localdevice;
-    return localdevice.isValid()
-            && localdevice.hostMode() != QBluetoothLocalDevice::HostMode::HostPoweredOff
+    return (localdevice.isValid() ?
+                localdevice.hostMode() != QBluetoothLocalDevice::HostMode::HostPoweredOff : true)
             && m_agent != NULL
-            && m_agent->supportedDiscoveryMethods() != QBluetoothDeviceDiscoveryAgent::LowEnergyMethod;
+            && m_agent->supportedDiscoveryMethods().testFlag(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
 }
 
 QString DeviceManager::getLastError()
@@ -50,9 +53,11 @@ QString DeviceManager::getLastError()
 void DeviceManager::onScanFinished()
 {
     QList<QBluetoothDeviceInfo> l = m_agent->discoveredDevices();
+    Log.d() << "discovered devices" << l.length();
     qDeleteAll(m_devices);
     m_devices.clear();
     for (int i=0; i<l.length(); i++) {
+        Log.d() << l.at(i).deviceUuid() << l.at(i).name() << l.at(i).address() << int(l.at(i).serviceClasses());
         for (uint j=0; j<sizeof(m_name_filter)/sizeof(m_name_filter[0]); j++) {
             if (l.at(i).name() == m_name_filter[j]) {
                 Device* d = new Device(l.at(i));
@@ -73,11 +78,13 @@ void DeviceManager::emitError(ErrorCode error_code, QString error_string)
 {
     m_last_error = error_code;
     m_error_string = error_string;
+    Log.d() << "----" << error_code << error_string << "----";
     emit error(error_code, error_string);
 }
 
 void DeviceManager::stop()
 {
+    Log.d() << "scan stopped";
     if (m_agent->isActive()) {
         m_agent->stop();
     }
@@ -85,6 +92,10 @@ void DeviceManager::stop()
 
 void DeviceManager::scan()
 {
+    Log.d() << "scan start";
+    if (!isValid()) {
+        emitError(SCAN_ERROR, "Bluetooth is not valid");
+    }
     m_agent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
 }
 
@@ -93,11 +104,17 @@ QVariant DeviceManager::getDeviceList()
     return QVariant::fromValue(m_devices);
 }
 
+QObject* DeviceManager::getService()
+{
+    return m_connected_service;
+}
+
 QObject* DeviceManager::connectToDevice(Device *d)
 {
     //TODO: compare current connected device and new device
 
     // Check info is valid
+    Log.d() << "Connecting";
     QBluetoothDeviceInfo info = d->getInfo();
     if(!info.isValid()) {
         emitError(CONNECT_ERROR, "device is not valid");
@@ -109,11 +126,13 @@ QObject* DeviceManager::connectToDevice(Device *d)
 
     m_controller = new QLowEnergyController(info, this);
     m_controller->connectToDevice();
+    Log.d() << "connect to device " << info.name();
     if (!waitForEvent(m_controller, SIGNAL(connected()))) {
         emitError(TIMEOUT, "Timeout");
         return NULL;
     }
 
+    Log.d() << "Connected " << m_controller->ConnectedState;
     // emit device connect before service create
     emit deviceConnected();
 
@@ -121,7 +140,7 @@ QObject* DeviceManager::connectToDevice(Device *d)
     m_controller->discoverServices();
     if (!waitForEvent(m_controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), SERVICE_DISCOVERY_TIMEOUT)) {
         emitError(TIMEOUT, "Service discovery timeout " + QString(SERVICE_DISCOVERY_TIMEOUT));
-        return NULL;
+
     }
 
     // get service list
@@ -149,6 +168,7 @@ QObject* DeviceManager::connectToDevice(Device *d)
 
 void DeviceManager::disconnectFromDevice()
 {
+    Log.d() << "disconnect";
     if (m_controller) {
         m_controller->disconnectFromDevice();
         if (!waitForEvent(m_controller, SIGNAL(disconnected()))) {
@@ -157,11 +177,12 @@ void DeviceManager::disconnectFromDevice()
         }
         delete m_controller;
         m_controller = NULL;
-	}
-	if (m_connected_service) {
-		delete m_connected_service;
-		// TODO: add dummy service to prevent null operation
-		m_connected_service = NULL;
-	}
-	emit deviceDisconnected();
+    }
+    if (m_connected_service) {
+        delete m_connected_service;
+        // TODO: add dummy service to prevent null operation
+        m_connected_service = NULL;
+        emit serviceDisconnected();
+    }
+    emit deviceDisconnected();
 }

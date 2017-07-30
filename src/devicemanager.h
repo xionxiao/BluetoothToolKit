@@ -24,7 +24,7 @@ signals:
     void deviceConnected();
     void deviceDisconnected();
     void serviceConnected();
-    void seviceDisconnected();
+    void serviceDisconnected();
     void error(int errorCode, QString errorString);
 
 public slots:
@@ -33,7 +33,7 @@ public slots:
     bool isValid();
     QObject* connectToDevice(Device *device);
     void disconnectFromDevice();
-    QObject* getService() { return m_connected_service; }
+    QObject* getService();
     QString getLastError();
 
 private slots:

@@ -41,5 +41,4 @@ HEADERS += \
     src/devicemanager.h \
     src/utils.h \
     src/service.h \
-    src/service.h \
     src/dfuservice.h
