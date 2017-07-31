@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <QLowEnergyController>
+#include <QBluetoothLocalDevice>
 #include "device.h"
 #include "service.h"
 
@@ -11,6 +12,8 @@ class DeviceManager : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QVariant deviceList READ getDeviceList NOTIFY updated)
+    Q_PROPERTY(QString name READ getName CONSTANT)
+    Q_PROPERTY(QString address READ getAddress CONSTANT)
 
 public:
     explicit DeviceManager(QObject *parent = 0);
@@ -37,6 +40,8 @@ public slots:
     QString getLastError();
 
 private slots:
+    QString getName();
+    QString getAddress();
     void onScanError(QBluetoothDeviceDiscoveryAgent::Error);
     void onScanFinished();
     void emitError(ErrorCode error_code, QString error_string);
@@ -49,9 +54,11 @@ private:
     QBluetoothDeviceDiscoveryAgent *m_agent = 0;
     QLowEnergyController *m_controller = 0;
     Service* m_connected_service = 0;
-    static const QString m_name_filter[];
+
     ErrorCode m_last_error = NOERROR;
     QString m_error_string;
+
+    QBluetoothLocalDevice m_localdevice;
 };
 
 #endif // DEVICEMANAGER_H

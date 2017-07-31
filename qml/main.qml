@@ -48,13 +48,13 @@ ApplicationWindow {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 270
-            text: qsTr("Now discoverable as")
+            text: deviceManager.address//bqsTr("Now discoverable as")
         }
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 300
-            text: qsTr("\"Allen\"")
+            text: deviceManager.name
         }
     }
 

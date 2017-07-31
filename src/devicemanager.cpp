@@ -1,5 +1,4 @@
 #include "devicemanager.h"
-#include <QBluetoothLocalDevice>
 #include <QMetaEnum>
 #include <QQmlEngine>
 #include "utils.h"
@@ -9,8 +8,6 @@ using namespace utils;
 
 #define DEVICE_DISCOVERY_TIMEOUT 5000
 #define SERVICE_DISCOVERY_TIMEOUT 10000
-
-const QString DeviceManager::m_name_filter[] = {"eScale", "boot"};
 
 DeviceManager::DeviceManager(QObject *parent) : QObject(parent)
 {
@@ -34,11 +31,20 @@ DeviceManager::~DeviceManager()
     }
 }
 
+QString DeviceManager::getName()
+{
+    return m_localdevice.name();
+}
+
+QString DeviceManager::getAddress()
+{
+    return m_localdevice.address().toString();
+}
+
 bool DeviceManager::isValid()
 {
-    QBluetoothLocalDevice localdevice;
-    return (localdevice.isValid() ?
-                localdevice.hostMode() != QBluetoothLocalDevice::HostMode::HostPoweredOff : true)
+    return (m_localdevice.isValid() ?
+                m_localdevice.hostMode() != QBluetoothLocalDevice::HostMode::HostPoweredOff : true)
             && m_agent != NULL
             && m_agent->supportedDiscoveryMethods().testFlag(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
 }
@@ -58,13 +64,8 @@ void DeviceManager::onScanFinished()
     m_devices.clear();
     for (int i=0; i<l.length(); i++) {
         Log.d() << l.at(i).deviceUuid() << l.at(i).name() << l.at(i).address() << int(l.at(i).serviceClasses());
-        for (uint j=0; j<sizeof(m_name_filter)/sizeof(m_name_filter[0]); j++) {
-            if (l.at(i).name() == m_name_filter[j]) {
-                Device* d = new Device(l.at(i));
-                m_devices.append((QObject*)(d));
-                break;
-            }
-        }
+        Device* d = new Device(l.at(i));
+        m_devices.append((QObject*)(d));
     }
     emit updated();
 }
