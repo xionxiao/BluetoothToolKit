@@ -48,7 +48,7 @@ ApplicationWindow {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 270
-            text: deviceManager.address//bqsTr("Now discoverable as")
+            text: deviceManager.address
         }
 
         Text {
@@ -140,7 +140,7 @@ ApplicationWindow {
                     height: 24
                     Text {
                         anchors.top: parent.top
-                        text: modelData.uuid
+                        text: modelData.uuid.toUpperCase()
                         color: highlighted ? "white" : "gray"
                     }
                 }

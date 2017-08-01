@@ -17,7 +17,7 @@ Device::Device(const QBluetoothDeviceInfo &info, QObject* parent) : QObject(pare
 
 QString Device::getUuid() const
 {
-    return uuid;
+    return uuid.mid(1, uuid.length()-2);
 }
 
 QString Device::getName() const

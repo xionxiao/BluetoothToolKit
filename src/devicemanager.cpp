@@ -63,7 +63,7 @@ void DeviceManager::onScanFinished()
     qDeleteAll(m_devices);
     m_devices.clear();
     for (int i=0; i<l.length(); i++) {
-        Log.d() << l.at(i).deviceUuid() << l.at(i).name() << l.at(i).address() << int(l.at(i).serviceClasses());
+        Log.d() << l.at(i).deviceUuid() << l.at(i).name() << l.at(i).address();
         Device* d = new Device(l.at(i));
         m_devices.append((QObject*)(d));
     }

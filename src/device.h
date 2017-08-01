@@ -10,10 +10,10 @@
 class Device : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString uuid READ getUuid NOTIFY uuidChanged)
-    Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
-    Q_PROPERTY(QString address READ getAddress NOTIFY addressChanged)
-    Q_PROPERTY(int rssi READ getRssi NOTIFY rssiChanged)
+    Q_PROPERTY(QString uuid READ getUuid CONSTANT)
+    Q_PROPERTY(QString name READ getName CONSTANT)
+    Q_PROPERTY(QString address READ getAddress CONSTANT)
+    Q_PROPERTY(int rssi READ getRssi CONSTANT)
     friend class DeviceManager;
 
 public:
@@ -24,12 +24,6 @@ public slots:
     QString getName() const;
     QString getAddress() const;
     int getRssi() const;
-
-signals:
-    void rssiChanged();
-    void nameChanged();
-    void uuidChanged();
-    void addressChanged();
 
 private:
     QBluetoothDeviceInfo getInfo();
