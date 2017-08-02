@@ -214,7 +214,7 @@ ApplicationWindow {
         title: "Please choose the firmware"
         folder: shortcuts.home
         onAccepted: {
-            console.log("You chose: " + fileDialog.fileUrls)
+            console.log("You chose: " + fileUrl)
         }
         onRejected: {
             console.log("Canceled")

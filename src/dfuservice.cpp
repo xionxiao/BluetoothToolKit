@@ -2,6 +2,7 @@
 #include "utils.h"
 #include <QFile>
 #include <QThread>
+#include <QUrl>
 
 using namespace utils;
 
@@ -43,10 +44,17 @@ void DfuService::onDisconnected()
     emit serviceDisconnected();
 }
 
+static QString toLocalFile(QString filename)
+{
+    QUrl url(filename);
+    QString local_file_name = url.isLocalFile() ? url.toLocalFile() : filename;
+    return local_file_name;
+}
+
 void DfuService::update(QString filename)
 {
+    filename = toLocalFile(filename);
     Log.d() << "(0) update" << filename;
-    // TODO: file name mangling from QML
     QFile file(filename);
     if (!file.exists()) {
         emitError(IOERROR, filename + " is not exist!");
