@@ -18,7 +18,8 @@ class Service : public QObject
 public:
     explicit Service(QLowEnergyService *service);
     virtual ~Service();
-    enum ErrorCode {NOERROR, TIMEOUT, SERVICE_ERROR, CHARACTOR_ERROR};
+    // TODO: refactory error code mechanism suit for Object hierarchical.
+    enum ErrorCode {NOERROR, TIMEOUT, IOERROR, SERVICE_ERROR, CHARACTOR_ERROR};
     Q_ENUM(ErrorCode)
 
 Q_SIGNALS:
@@ -63,7 +64,7 @@ protected:
     QHash<QString, QByteArray> m_notification_data;
     QLowEnergyService::ServiceState m_state = INVALID_SERVICE;
     QLowEnergyService::ServiceState m_prev_state = INVALID_SERVICE;
-    int m_last_error;
+    ErrorCode m_last_error;
     QString m_error_string;
 };
 

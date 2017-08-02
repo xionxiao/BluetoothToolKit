@@ -43,13 +43,25 @@ void DfuService::onDisconnected()
     emit serviceDisconnected();
 }
 
-void DfuService::update()
+void DfuService::update(QString filename)
 {
-    QFile file(":/assets/eScale_v1.7.0.bin");
-    Q_ASSERT(file.exists());
+    Log.d() << "(0) update" << filename;
+    // TODO: file name mangling from QML
+    QFile file(filename);
+    if (!file.exists()) {
+        emitError(IOERROR, filename + " is not exist!");
+        return;
+    }
     uint32_t size = (uint32_t)file.size();
-    Q_ASSERT(size > 0);
+    if (size <= 0) {
+        emitError(IOERROR, "filesize error " + QString(size));
+        return;
+    }
     file.open(QIODevice::ReadOnly);
+    if (!file.isOpen()) {
+        emitError(IOERROR, "file open failed");
+        return;
+    }
 
     this->startDfu();
     this->sendFirmwareSize(size);
