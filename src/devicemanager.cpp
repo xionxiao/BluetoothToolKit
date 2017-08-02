@@ -15,10 +15,10 @@ DeviceManager::DeviceManager(QObject *parent) : QObject(parent)
     if (m_localdevice->isValid()) {
         m_isPowerOff = m_localdevice->hostMode() == QBluetoothLocalDevice::HostMode::HostPoweredOff;
     }
-    initAgent();
+    resetDiscoveryAgent();
 }
 
-void DeviceManager::initAgent()
+void DeviceManager::resetDiscoveryAgent()
 {
     Log.d() << "init Discovery Agent";
     if (m_agent) delete m_agent;
@@ -66,7 +66,7 @@ bool DeviceManager::isValid()
                 m_devices.clear();
                 emit updated();
             } else {
-                initAgent();
+                resetDiscoveryAgent();
             }
             emit powerStateChanged();
         }
@@ -75,7 +75,7 @@ bool DeviceManager::isValid()
             return false;
         }
     }
-    if (!m_agent->supportedDiscoveryMethods().testFlag(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod)) {
+    if (!(m_agent && m_agent->supportedDiscoveryMethods().testFlag(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod))) {
         emitError(INVALID, "Bluetooth not support Low Energy Device");
         return false;
     }
@@ -119,20 +119,15 @@ void DeviceManager::emitError(ErrorCode error_code, QString error_string)
 void DeviceManager::stop()
 {
     Log.d() << "scan stopped";
-    if (!isValid()) {
-        return;
-    }
-    if (m_agent->isActive()) {
+    if (!isValid()) { return; }
+    if (m_agent->isActive())
         m_agent->stop();
-    }
 }
 
 void DeviceManager::scan()
 {
     Log.d() << "scan start";
-    if (!isValid()) {
-        return;
-    }
+    if (!isValid()) { return; }
     m_agent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
 }
 
@@ -148,7 +143,8 @@ QObject* DeviceManager::getService()
 
 QObject* DeviceManager::connectToDevice(Device *d)
 {
-    //TODO: check isValid() prevent poweroff
+    Log.d() << "Connect to device" << d->name;
+    if (!isValid()) return NULL;
     //TODO: compare current connected device and new device
 
     // Check info is valid
