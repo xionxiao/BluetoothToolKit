@@ -32,7 +32,7 @@ ApplicationWindow {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 210
-            text: qsTr("Bluetooth: On")
+            text: qsTr("Bluetooth: " + deviceManager.powerState)
             font.bold: true
         }
 
@@ -93,6 +93,7 @@ ApplicationWindow {
                 anchors.right: parent.right
                 width: 24
                 height:24
+                running: false
             }
 
             Rectangle {
@@ -193,8 +194,8 @@ ApplicationWindow {
         highlighted: true
         enabled: false
         onClicked: {
-            deviceManager.scan()
             busy_indicator.running = true
+            deviceManager.scan()
         }
     }
 
@@ -223,13 +224,21 @@ ApplicationWindow {
 
     Component.onCompleted: {
         refresh_button.enabled = true
-        deviceManager.scan()
+        if (deviceManager.isValid()) {
+            busy_indicator.running = true;
+            deviceManager.scan()
+        }
     }
 
     Connections {
         target: deviceManager
         onUpdated: {
             busy_indicator.running = false
+        }
+        onError: {
+            console.log(busy_indicator.running)
+            busy_indicator.running = false
+            console.log(errorCode, errorString)
         }
     }
 }

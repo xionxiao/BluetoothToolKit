@@ -11,14 +11,23 @@ using namespace utils;
 
 DeviceManager::DeviceManager(QObject *parent) : QObject(parent)
 {
-    m_agent = new QBluetoothDeviceDiscoveryAgent(this);
-    if (isValid()) {
-        m_agent->setLowEnergyDiscoveryTimeout(DEVICE_DISCOVERY_TIMEOUT);
-        connect(m_agent, SIGNAL(finished()), this, SLOT(onScanFinished()));
-        connect(m_agent, SIGNAL(error(QBluetoothDeviceDiscoveryAgent::Error)),
-                this, SLOT(onScanError(QBluetoothDeviceDiscoveryAgent::Error)));
-        connect(m_agent, SIGNAL(canceled()), this, SIGNAL(stopped()));
+    m_localdevice = new QBluetoothLocalDevice(this);
+    if (m_localdevice->isValid()) {
+        m_isPowerOff = m_localdevice->hostMode() == QBluetoothLocalDevice::HostMode::HostPoweredOff;
     }
+    initAgent();
+}
+
+void DeviceManager::initAgent()
+{
+    Log.d() << "init Discovery Agent";
+    if (m_agent) delete m_agent;
+    m_agent = new QBluetoothDeviceDiscoveryAgent();
+    m_agent->setLowEnergyDiscoveryTimeout(DEVICE_DISCOVERY_TIMEOUT);
+    connect(m_agent, SIGNAL(finished()), this, SLOT(onScanFinished()));
+    connect(m_agent, SIGNAL(error(QBluetoothDeviceDiscoveryAgent::Error)),
+            this, SLOT(onScanError(QBluetoothDeviceDiscoveryAgent::Error)));
+    connect(m_agent, SIGNAL(canceled()), this, SIGNAL(stopped()));
 }
 
 DeviceManager::~DeviceManager()
@@ -29,24 +38,48 @@ DeviceManager::~DeviceManager()
         delete m_controller;
         m_controller = NULL;
     }
+    if (m_agent) delete m_agent;
 }
 
 QString DeviceManager::getName()
 {
-    return m_localdevice.name();
+    return m_localdevice->name();
 }
 
 QString DeviceManager::getAddress()
 {
-    return m_localdevice.address().toString();
+    return m_localdevice->address().toString();
+}
+
+QString DeviceManager::getPowerState()
+{
+    return m_isPowerOff ? "Off" : "On";
 }
 
 bool DeviceManager::isValid()
 {
-    return (m_localdevice.isValid() ?
-                m_localdevice.hostMode() != QBluetoothLocalDevice::HostMode::HostPoweredOff : true)
-            && m_agent != NULL
-            && m_agent->supportedDiscoveryMethods().testFlag(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
+    if (m_localdevice->isValid()) {
+        if (m_isPowerOff != m_localdevice->hostMode() == QBluetoothLocalDevice::HostMode::HostPoweredOff) {
+            m_isPowerOff = m_localdevice->hostMode() == QBluetoothLocalDevice::HostMode::HostPoweredOff;
+            if (m_isPowerOff) {
+                qDeleteAll(m_devices);
+                m_devices.clear();
+                emit updated();
+            } else {
+                initAgent();
+            }
+            emit powerStateChanged();
+        }
+        if (m_localdevice->hostMode() == QBluetoothLocalDevice::HostMode::HostPoweredOff) {
+            emitError(POWEROFF, "Device is power off");
+            return false;
+        }
+    }
+    if (!m_agent->supportedDiscoveryMethods().testFlag(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod)) {
+        emitError(INVALID, "Bluetooth not support Low Energy Device");
+        return false;
+    }
+    return true;
 }
 
 QString DeviceManager::getLastError()
@@ -86,6 +119,9 @@ void DeviceManager::emitError(ErrorCode error_code, QString error_string)
 void DeviceManager::stop()
 {
     Log.d() << "scan stopped";
+    if (!isValid()) {
+        return;
+    }
     if (m_agent->isActive()) {
         m_agent->stop();
     }
@@ -95,7 +131,7 @@ void DeviceManager::scan()
 {
     Log.d() << "scan start";
     if (!isValid()) {
-        emitError(SCAN_ERROR, "Bluetooth is not valid");
+        return;
     }
     m_agent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
 }
@@ -112,6 +148,7 @@ QObject* DeviceManager::getService()
 
 QObject* DeviceManager::connectToDevice(Device *d)
 {
+    //TODO: check isValid() prevent poweroff
     //TODO: compare current connected device and new device
 
     // Check info is valid
