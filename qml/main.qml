@@ -2,6 +2,7 @@ import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
 import QtQuick.Controls.Material 2.0
+import QtQuick.Dialogs 1.2
 
 ApplicationWindow {
     visible: true
@@ -43,6 +44,9 @@ ApplicationWindow {
             text: qsTr("Firmware")
             font.capitalization: Font.MixedCase
             highlighted: true
+            onClicked: {
+                fs.open()
+            }
         }
 
         Text {
@@ -203,6 +207,18 @@ ApplicationWindow {
         height: 36
         text: qsTr("display all devices")
         checked: true
+    }
+
+    FileDialog {
+        id: fs
+        title: "Please choose the firmware"
+        folder: shortcuts.home
+        onAccepted: {
+            console.log("You chose: " + fileDialog.fileUrls)
+        }
+        onRejected: {
+            console.log("Canceled")
+        }
     }
 
     Component.onCompleted: {
