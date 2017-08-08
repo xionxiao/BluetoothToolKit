@@ -157,7 +157,8 @@ ApplicationWindow {
                 }
                 Button {
                     id: download_button
-                    visible: parent.highlighted
+                    /* temporary name filter with boot */
+                    visible: parent.highlighted && modelData.name == "boot"
                     anchors.right: parent.right
                     height: 48
                     width: 48
