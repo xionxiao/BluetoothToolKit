@@ -8,6 +8,7 @@
 #define SERVICE_DISCOVERED QLowEnergyService::ServiceState::ServiceDiscovered
 #define DISCOVERY_REQUIRED QLowEnergyService::ServiceState::DiscoveryRequired
 #define DISCOVERING_SERVICES QLowEnergyService::ServiceState::DiscoveringServices
+/* not valid again when reconnect */
 #define INVALID_SERVICE QLowEnergyService::ServiceState::InvalidService
 
 #define DEFAULT_TIMEOUT 2000
@@ -62,8 +63,8 @@ protected slots:
 protected:
     QLowEnergyService *m_service;
     QHash<QString, QByteArray> m_notification_data;
-    QLowEnergyService::ServiceState m_state = INVALID_SERVICE;
-    QLowEnergyService::ServiceState m_prev_state = INVALID_SERVICE;
+    QLowEnergyService::ServiceState m_state = DISCOVERY_REQUIRED;
+    QLowEnergyService::ServiceState m_prev_state = DISCOVERY_REQUIRED;
     ErrorCode m_last_error;
     QString m_error_string;
 };

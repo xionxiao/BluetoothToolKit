@@ -22,9 +22,9 @@ void Service::setupService(QLowEnergyService* service)
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     m_service = service;
 
-    // TODO: check service state
-    if (m_service != 0 ) {
-
+    // check service state
+    // re-connect could no change service to valid, skip this
+    if (m_service != 0 && m_service->state() != INVALID_SERVICE) {
         // handle Service State changes
         connect(m_service, SIGNAL(stateChanged(QLowEnergyService::ServiceState)),
                 this, SLOT(processStateChanged(QLowEnergyService::ServiceState)));
@@ -124,12 +124,12 @@ QByteArray Service::read(QLowEnergyCharacteristic &c)
 
 void Service::write(QLowEnergyCharacteristic &c, QByteArray &bytes, QLowEnergyService::WriteMode mode)
 {
-    if (!c.isValid()) {
-        emitError(CHARACTOR_ERROR, "write charactor is not valid");
-        return;
-    }
     if (!this->isValid()) {
         emitError(SERVICE_ERROR, "service is not valid");
+        return;
+    }
+    if (!c.isValid()) {
+        emitError(CHARACTOR_ERROR, "write charactor is not valid");
         return;
     }
     m_service->writeCharacteristic(c, bytes, mode);
@@ -138,12 +138,12 @@ void Service::write(QLowEnergyCharacteristic &c, QByteArray &bytes, QLowEnergySe
 
 bool Service::readSync(QLowEnergyCharacteristic &c, QByteArray &bs, uint timeout)
 {
-    if(!c.isValid()) {
-        emitError(CHARACTOR_ERROR, "read charactor is not valid");
-        return false;
-    }
     if (!this->isValid()) {
         emitError(SERVICE_ERROR, "service is not valid");
+        return false;
+    }
+    if(!c.isValid()) {
+        emitError(CHARACTOR_ERROR, "read charactor is not valid");
         return false;
     }
     m_service->readCharacteristic(c);
@@ -164,10 +164,6 @@ bool Service::readSync(QLowEnergyCharacteristic &c, QByteArray &bs, uint timeout
 
 bool Service::writeSync(QLowEnergyCharacteristic &c, QByteArray &bytes, uint timeout, QLowEnergyService::WriteMode mode)
 {
-    if(!c.isValid()) {
-        emitError(CHARACTOR_ERROR, "write charactor is not valid");
-        return false;
-    }
     m_service->writeCharacteristic(c, bytes, mode);
     if (waitForEvent(m_service, SIGNAL(characteristicWritten(QLowEnergyCharacteristic,QByteArray)), timeout)) {
         return true;
