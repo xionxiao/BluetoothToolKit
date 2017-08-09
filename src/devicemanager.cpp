@@ -6,19 +6,24 @@
 
 using namespace utils;
 
-#define DEVICE_DISCOVERY_TIMEOUT 5000
-#define SERVICE_DISCOVERY_TIMEOUT 10000
+/* device discovery time */
+#define DEVICE_DISCOVERY_TIMEOUT	10000
+#define SERVICE_DISCOVERY_TIMEOUT	10000
+
+#define HOST_POWER_OFF QBluetoothLocalDevice::HostMode::HostPoweredOff
 
 DeviceManager::DeviceManager(QObject *parent) : QObject(parent)
 {
+    /* LocalDevice will be destroyed automatically */
     m_localdevice = new QBluetoothLocalDevice(this);
+    /* check localdevice is valid or not is platform dependent */
     if (m_localdevice->isValid()) {
-        m_isPowerOff = m_localdevice->hostMode() == QBluetoothLocalDevice::HostMode::HostPoweredOff;
+        m_isPowerOff = m_localdevice->hostMode() == HOST_POWER_OFF;
     }
-    resetDiscoveryAgent();
+    initDiscoveryAgent();
 }
 
-void DeviceManager::resetDiscoveryAgent()
+void DeviceManager::initDiscoveryAgent()
 {
     Log.d() << "init Discovery Agent";
     if (m_agent) delete m_agent;
@@ -43,12 +48,12 @@ DeviceManager::~DeviceManager()
 
 QString DeviceManager::getName()
 {
-    return m_localdevice->name();
+    return m_localdevice->isValid() ? m_localdevice->name() : "";
 }
 
 QString DeviceManager::getAddress()
 {
-    return m_localdevice->address().toString();
+    return m_localdevice->isValid() ? m_localdevice->address().toString() : "";
 }
 
 QString DeviceManager::getPowerState()
@@ -58,23 +63,26 @@ QString DeviceManager::getPowerState()
 
 bool DeviceManager::isValid()
 {
+    /* check host power off or not */
     if (m_localdevice->isValid()) {
-        if (m_isPowerOff != m_localdevice->hostMode() == QBluetoothLocalDevice::HostMode::HostPoweredOff) {
-            m_isPowerOff = m_localdevice->hostMode() == QBluetoothLocalDevice::HostMode::HostPoweredOff;
+        if (m_isPowerOff != m_localdevice->hostMode() == HOST_POWER_OFF) {
+            m_isPowerOff = (m_localdevice->hostMode() == HOST_POWER_OFF);
             if (m_isPowerOff) {
                 qDeleteAll(m_devices);
                 m_devices.clear();
                 emit updated();
             } else {
-                resetDiscoveryAgent();
+                initDiscoveryAgent();
             }
             emit powerStateChanged();
         }
-        if (m_localdevice->hostMode() == QBluetoothLocalDevice::HostMode::HostPoweredOff) {
+        if (m_localdevice->hostMode() == HOST_POWER_OFF) {
+            /* should emit error here? */
             emitError(POWEROFF, "Device is power off");
             return false;
         }
     }
+    /* check support BLE or not */
     if (!(m_agent && m_agent->supportedDiscoveryMethods().testFlag(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod))) {
         emitError(INVALID, "Bluetooth not support Low Energy Device");
         return false;
@@ -86,7 +94,7 @@ QString DeviceManager::getLastError()
 {
     QMetaEnum metaEnum = QMetaEnum::fromType<DeviceManager::ErrorCode>();
     QString error_code = metaEnum.valueToKey(m_last_error);
-    return error_code + "|" + m_error_string;
+    return error_code + ":" + m_error_string;
 }
 
 void DeviceManager::onScanFinished()
