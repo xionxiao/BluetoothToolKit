@@ -19,10 +19,21 @@ class Device : public QObject
 public:
     explicit Device(const QBluetoothDeviceInfo &d, QObject* parent=0);
 
-public slots:
-    QString getUuid() const;
+private slots:
     QString getName() const;
+    /**
+     * @brief get uuid for MacOS (for MacOS could not get bluetooth device address)
+     *        if operation system is not OSX, returen device address
+     */
+    QString getUuid() const;
+    /**
+     * @brief get mac address of device
+     *        if operation system is MacOS, return device uuid
+     */
     QString getAddress() const;
+    /**
+     * @brief get the rssi when device was last scanned
+     */
     int getRssi() const;
 
 private:

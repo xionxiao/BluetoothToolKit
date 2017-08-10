@@ -128,7 +128,7 @@ public slots:
 
     /**
      * @brief  getLastError
-     * @return string formated as "ErrorCode:ErrorString"
+     * @return string formated as "ErrorCode|ErrorString"
      */
     QString getLastError();
 

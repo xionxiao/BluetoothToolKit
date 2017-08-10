@@ -18,7 +18,7 @@ DeviceManager::DeviceManager(QObject *parent) : QObject(parent)
     m_localdevice = new QBluetoothLocalDevice(this);
     /* check localdevice is valid or not is platform dependent */
     if (m_localdevice->isValid()) {
-        m_isPowerOff = m_localdevice->hostMode() == HOST_POWER_OFF;
+        m_is_poweroff = m_localdevice->hostMode() == HOST_POWER_OFF;
     }
     initDiscoveryAgent();
 }
@@ -58,16 +58,16 @@ QString DeviceManager::getAddress()
 
 QString DeviceManager::getPowerState()
 {
-    return m_isPowerOff ? "Off" : "On";
+    return m_is_poweroff ? "Off" : "On";
 }
 
 bool DeviceManager::isValid()
 {
     /* check host power off or not */
     if (m_localdevice->isValid()) {
-        if (m_isPowerOff != m_localdevice->hostMode() == HOST_POWER_OFF) {
-            m_isPowerOff = (m_localdevice->hostMode() == HOST_POWER_OFF);
-            if (m_isPowerOff) {
+        if (m_is_poweroff != m_localdevice->hostMode() == HOST_POWER_OFF) {
+            m_is_poweroff = (m_localdevice->hostMode() == HOST_POWER_OFF);
+            if (m_is_poweroff) {
                 qDeleteAll(m_devices);
                 m_devices.clear();
                 emit updated();
@@ -94,7 +94,7 @@ QString DeviceManager::getLastError()
 {
     QMetaEnum metaEnum = QMetaEnum::fromType<DeviceManager::ErrorCode>();
     QString error_code = metaEnum.valueToKey(m_last_error);
-    return error_code + ":" + m_error_string;
+    return error_code + "|" + m_error_string;
 }
 
 void DeviceManager::onScanFinished()
