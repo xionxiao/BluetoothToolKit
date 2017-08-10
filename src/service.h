@@ -19,38 +19,126 @@ class Service : public QObject
 public:
     explicit Service(QLowEnergyService *service);
     virtual ~Service();
-    // TODO: refactory error code mechanism suit for Object hierarchical.
+
+    /**
+     * @brief The ErrorCode enum
+     */
     enum ErrorCode {NOERROR, TIMEOUT, IOERROR, SERVICE_ERROR, CHARACTOR_ERROR};
     Q_ENUM(ErrorCode)
 
 Q_SIGNALS:
     // notify from charactor, should not be used outside.
-    void notify(const QString name, const QByteArray data);
+    /**
+     * @brief bluetooth charactor notification
+     * @param name charactor uuid
+     * @param data notification data
+     * @note
+     *        private signal, should be used inside
+     */
+    void notify(const QString uuid, const QByteArray data);
+    /**
+     * @brief error signal
+     * @param errorCode    @enum Service::ErrorCode
+     * @param errorString  error details
+     */
     void error(int errorCode, QString errorString);
+    /**
+     * @brief signal indicate service connected
+     */
     void serviceConnected();
+    /**
+     * @brief signal indicate service disconnected
+     */
     void serviceDisconnected();
 
-protected:
-    void setupService(QLowEnergyService* service);
-    QLowEnergyService* getService();
-
-    virtual void onConnected() { emit serviceConnected(); }
-    virtual void onDisconnected() { emit serviceDisconnected(); }
-
 public slots:
+    /**
+     * @brief  get service type, should be inherit by subclass
+     * @return type name
+     */
     virtual QString type() { return QString("Generic"); }
-    bool isValid() { return m_service && m_service->state() == SERVICE_DISCOVERED; }
+    /**
+     * @brief  the service is valid to use
+     */
+    bool isValid();
+    /**
+     * @brief  getLastError
+     * @return string formated as "ErrorCode|ErrorString"
+     */
     QString getLastError();
 
+protected:
+    /**
+     * @brief init Service
+     */
+    void initService(QLowEnergyService* service);
+    /**
+     * @brief get QLowEnergyService for subclass
+     */
+    QLowEnergyService* getService();
+
+    /**
+     * @brief onConnected callback for subclasses
+     */
+    virtual void onConnected() { emit serviceConnected(); }
+    /**
+     * @brief onDisconnected callback for subclasses
+     */
+    virtual void onDisconnected() { emit serviceDisconnected(); }
+
 protected slots:
+    /**
+     * @brief  read notification of a certain character
+     * @param  ble character
+     * @return notification value
+     * @note
+     *         ble notification will be stored in a hashmap of Service class
+     *         and send notify() signal to notify customer
+     */
+
     QByteArray readNotificationValue(QLowEnergyCharacteristic &c);
+    /**
+     * @brief read Notification value synchronously until timeout
+     * @param c            notified character to read
+     * @param bs           ByteArrary to store notification data
+     * @param timeout      wait for notification timeout
+     * @return             ture - if read success; false - if read timeout
+     */
     bool readNotificationValueSync(QLowEnergyCharacteristic &c, QByteArray &bs, uint timeout=DEFAULT_TIMEOUT);
 
+    /**
+     * @brief read the latest value of character
+     * @param c    character to read
+     * @return     ByteArrary read out
+     */
     QByteArray read(QLowEnergyCharacteristic &c);
+
+    /**
+     * @brief read the value of character synchronously until timeout
+     * @param c            notified character to read
+     * @param bs           ByteArrary read out
+     * @param timeout      read complete timeout
+     * @return             ture - if read success; false - if read timeout
+     */
     bool readSync(QLowEnergyCharacteristic &c, QByteArray &bs, uint timeout=DEFAULT_TIMEOUT);
 
+    /**
+     * @brief write value to character
+     * @param c            notified character to read
+     * @param bytes        bytes to write, limite to 20 bytes for BLE ability
+     * @param mode         @enum QLowEnergyService::WriteMode
+     */
     void write(QLowEnergyCharacteristic &c, QByteArray &bytes,
                QLowEnergyService::WriteMode mode = QLowEnergyService::WriteWithResponse);
+
+    /**
+     * @brief write synchronously until timeout
+     * @param c            notified character to read
+     * @param bytes        bytes to write, limite to 20 bytes for BLE ability
+     * @param timeout      write complete timeout
+     * @param mode         @enum QLowEnergyService::WriteMode
+     * @return             ture - if write success; false - if timeout
+     */
     bool writeSync(QLowEnergyCharacteristic &c, QByteArray &bytes, uint timeout=DEFAULT_TIMEOUT,
                    QLowEnergyService::WriteMode mode = QLowEnergyService::WriteWithResponse);
 

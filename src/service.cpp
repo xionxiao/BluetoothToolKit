@@ -7,7 +7,7 @@ using namespace utils;
 
 Service::Service(QLowEnergyService* service)
 {
-    setupService(service);
+    initService(service);
 }
 
 Service::~Service()
@@ -15,7 +15,7 @@ Service::~Service()
     Log.d() << "~Service";
 }
 
-void Service::setupService(QLowEnergyService* service)
+void Service::initService(QLowEnergyService* service)
 {
     // Set object ownership to C++ not QML to manage Service lifecycle.
     // @link {http://doc.qt.io/qt-5/qqmlengine.html#ObjectOwnership-enum}
@@ -48,6 +48,11 @@ QLowEnergyService* Service::getService()
     return m_service;
 }
 
+bool Service::isValid()
+{
+    return m_service && m_service->state() == SERVICE_DISCOVERED;
+}
+
 void Service::emitError(ErrorCode error_code, QString error_string)
 {
     m_last_error = error_code;
@@ -65,9 +70,9 @@ QString Service::getLastError()
 
 void Service::processNotification(QLowEnergyCharacteristic c,  QByteArray bs)
 {
-    QString name = c.name();
-    m_notification_data[name] = bs;
-    emit notify(name, bs);
+    QString uuid = c.uuid().toString();
+    m_notification_data[uuid] = bs;
+    emit notify(uuid, bs);
 }
 
 void Service::processStateChanged(QLowEnergyService::ServiceState state)
