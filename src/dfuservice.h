@@ -4,6 +4,9 @@
 #include "service.h"
 #include <QFile>
 
+/**
+ * @brief The DfuService class
+ */
 class DfuService : public Service
 {
     Q_OBJECT
@@ -18,16 +21,39 @@ public:
     virtual ~DfuService();
 
 Q_SIGNALS:
+    /**
+     * @brief notify update process
+     * @param the firmware write percentage
+     */
     void updateChanged(int percentage);
+    /**
+     * @brief notify update complete
+     */
     void updateCompleted();
 
 protected:
+    /**
+     * @brief overrite @class Service onConnected() method
+     */
     virtual void onConnected();
+    /**
+     * @brief overrite @class Service onDisconnected() method
+     */
     virtual void onDisconnected();
 
 public slots:
+    /**
+     * @brief   Service type
+     * @return  "Bootloader"
+     */
     virtual QString type() { return QString("Bootloader"); }
-    void update(QString filename);
+
+    /**
+     * @brief update firmware
+     * @param filePath   path of the firmware file
+     *                   auto deal with "file://" to local file path
+     */
+    void update(QString filePath);
 
 private slots:
     void startDfu();

@@ -8,6 +8,7 @@ using namespace utils;
 
 /* device discovery time */
 #define DEVICE_DISCOVERY_TIMEOUT	10000
+#define DEVICE_CONNECT_TIMEOUT		10000
 #define SERVICE_DISCOVERY_TIMEOUT	10000
 
 #define HOST_POWER_OFF QBluetoothLocalDevice::HostMode::HostPoweredOff
@@ -169,8 +170,11 @@ QObject* DeviceManager::connectToDevice(Device *d)
     m_controller = new QLowEnergyController(info, this);
     m_controller->connectToDevice();
     Log.d() << "connect to device " << info.name();
-    if (!waitForEvent(m_controller, SIGNAL(connected()))) {
-        emitError(TIMEOUT, "Timeout");
+    if (!waitForEvent(m_controller, SIGNAL(connected()), DEVICE_CONNECT_TIMEOUT)) {
+        m_controller->disconnectFromDevice();
+        delete m_controller;
+        m_controller = NULL;
+        emitError(TIMEOUT, "Device connect timeout");
         return NULL;
     }
 

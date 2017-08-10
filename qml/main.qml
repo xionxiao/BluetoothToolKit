@@ -153,6 +153,9 @@ ApplicationWindow {
                     anchors.fill: parent
                     onClicked: {
                         listView.currentIndex = highlighted ? -1 : index
+                        console.log(modelData)
+                        var service = deviceManager.connectToDevice(modelData)
+                        console.log(service, service.name, service.uuid)
                     }
                 }
                 Button {

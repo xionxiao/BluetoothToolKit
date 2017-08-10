@@ -51,13 +51,13 @@ static QString toLocalFile(QString filename)
     return local_file_name;
 }
 
-void DfuService::update(QString filename)
+void DfuService::update(QString filePath)
 {
-    filename = toLocalFile(filename);
-    Log.d() << "(0) update" << filename;
-    QFile file(filename);
+    filePath = toLocalFile(filePath);
+    Log.d() << "(0) update" << filePath;
+    QFile file(filePath);
     if (!file.exists()) {
-        emitError(IOERROR, filename + " is not exist!");
+        emitError(IOERROR, filePath + " is not exist!");
         return;
     }
     uint32_t size = (uint32_t)file.size();

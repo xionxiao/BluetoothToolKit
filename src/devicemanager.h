@@ -110,6 +110,7 @@ public slots:
      *         return QObject* for QML usage
      *         the Service is created in DeviceMangager
      *         the lifecycle is managed by DeviceManager not QML js engine
+     *         this method is synchronously
      */
     QObject* connectToDevice(Device *device);
 

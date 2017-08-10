@@ -13,9 +13,24 @@
 
 #define DEFAULT_TIMEOUT 2000
 
+/**
+ * @brief The Service class
+ *        Provide common synchronous and asynchronous read/write/notification method of a BLE service
+ *        It's better be used by subclassing it and public functionality method to QML
+ */
 class Service : public QObject
 {
     Q_OBJECT
+    /**
+     * @brief device name
+     */
+    Q_PROPERTY(QString name READ getName CONSTANT)
+    /**
+     * @brief uuid for MacOS (for MacOS could not get bluetooth device address)
+     *        if operation system is not OSX, returen device address
+     */
+    Q_PROPERTY(QString uuid READ getUuid CONSTANT)
+
 public:
     explicit Service(QLowEnergyService *service);
     virtual ~Service();
@@ -27,7 +42,6 @@ public:
     Q_ENUM(ErrorCode)
 
 Q_SIGNALS:
-    // notify from charactor, should not be used outside.
     /**
      * @brief bluetooth charactor notification
      * @param name charactor uuid
@@ -53,12 +67,12 @@ Q_SIGNALS:
 
 public slots:
     /**
-     * @brief  get service type, should be inherit by subclass
+     * @brief  get service type, should be overrite by subclass
      * @return type name
      */
     virtual QString type() { return QString("Generic"); }
     /**
-     * @brief  the service is valid to use
+     * @brief  if the service is valid (descovered)
      */
     bool isValid();
     /**
@@ -147,6 +161,10 @@ protected slots:
     void processStateChanged(QLowEnergyService::ServiceState state);
     void processServiceError(QLowEnergyService::ServiceError error);
     void emitError(ErrorCode error_code, QString error_string);
+
+private:
+    QString getName() { return m_service ? m_service->serviceName() : ""; }
+    QString getUuid() { return m_service ? m_service->serviceUuid().toString() : ""; }
 
 protected:
     QLowEnergyService *m_service;

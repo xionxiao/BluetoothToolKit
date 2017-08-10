@@ -10,30 +10,32 @@
 class Device : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString uuid READ getUuid CONSTANT)
+    /**
+     * @brief device name
+     */
     Q_PROPERTY(QString name READ getName CONSTANT)
+    /**
+     * @brief uuid for MacOS (for MacOS could not get bluetooth device address)
+     *        if operation system is not OSX, returen device address
+     */
+    Q_PROPERTY(QString uuid READ getUuid CONSTANT)
+    /**
+     * @brief get mac address of device
+     *        if operation system is MacOS, return device uuid
+     */
     Q_PROPERTY(QString address READ getAddress CONSTANT)
+    /**
+     * @brief get the rssi when device was last scanned
+     */
     Q_PROPERTY(int rssi READ getRssi CONSTANT)
-    friend class DeviceManager;
 
 public:
     explicit Device(const QBluetoothDeviceInfo &d, QObject* parent=0);
 
 private slots:
     QString getName() const;
-    /**
-     * @brief get uuid for MacOS (for MacOS could not get bluetooth device address)
-     *        if operation system is not OSX, returen device address
-     */
     QString getUuid() const;
-    /**
-     * @brief get mac address of device
-     *        if operation system is MacOS, return device uuid
-     */
     QString getAddress() const;
-    /**
-     * @brief get the rssi when device was last scanned
-     */
     int getRssi() const;
 
 private:
@@ -45,6 +47,7 @@ private:
     QString address;
     int rssi;
     QBluetoothDeviceInfo m_device_info;
+    friend class DeviceManager;
 };
 
 //Q_DECLARE_METATYPE(Device)

@@ -8,6 +8,7 @@ using namespace utils;
 Service::Service(QLowEnergyService* service)
 {
     initService(service);
+    Log.d() << service->serviceName() << " " << service->serviceUuid() << endl;
 }
 
 Service::~Service()
