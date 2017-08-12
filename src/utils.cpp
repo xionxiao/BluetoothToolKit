@@ -2,6 +2,8 @@
 #include <QEventLoop>
 #include <QTimer>
 
+utils::LogClass Log;
+
 bool utils::waitForEvent(const QObject *sender, const char *signal, uint timeout)
 {
     QEventLoop loop;

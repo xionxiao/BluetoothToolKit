@@ -27,9 +27,9 @@ public:
 };
 
 /**
- * @brief Global static Log object
+ * @brief Global Log object
  */
-static LogClass Log;
+extern LogClass Log;
 
 }
 
