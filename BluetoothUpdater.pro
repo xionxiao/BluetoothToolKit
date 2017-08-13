@@ -37,8 +37,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES +=
 
 HEADERS += \
-    src/device.h \
-    src/devicemanager.h \
-    src/utils.h \
-    src/service.h \
-    src/dfuservice.h
+    include/device.h \
+    include/devicemanager.h \
+    include/dfuservice.h \
+    include/service.h \
+    include/utils.h
