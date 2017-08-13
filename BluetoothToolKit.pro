@@ -10,6 +10,7 @@ SOURCES += \
     src/service.cpp \
     src/dfuservice.cpp
 
+INCLUDEPATH += include
 RESOURCES += qml/qml.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
