@@ -154,8 +154,10 @@ ApplicationWindow {
                     onClicked: {
                         listView.currentIndex = highlighted ? -1 : index
                         console.log(modelData)
+                        // TODO:
+                        // this function is synchronous, it's better to use WorkerScript
                         var service = deviceManager.connectToDevice(modelData)
-                        console.log(service, service.name, service.uuid)
+                        console.log(service.length())
                     }
                 }
                 Button {

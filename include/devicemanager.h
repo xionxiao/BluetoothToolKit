@@ -104,15 +104,15 @@ public slots:
     /**
      * @brief connect to device
      * @param device - a device from deviceList
-     * @return pointer to a Service object
+     * @return list of pointer to Service object
      *
      * @note
-     *         return QObject* for QML usage
-     *         the Service is created in DeviceMangager
-     *         the lifecycle is managed by DeviceManager not QML js engine
+     *         return QList<QObject*> for QML use
+     *         the Services are created in DeviceMangager
+     *         and lifecycles are managed by DeviceManager not QML js engine
      *         this method is synchronously
      */
-    QObject* connectToDevice(Device *device);
+    QList<QObject*> connectToDevice(Device *device);
 
     /**
      * @brief disconnect from device
@@ -147,12 +147,16 @@ private:
     void initDiscoveryAgent();
 
 private:
-    QList<QObject*> m_devices;
     QBluetoothDeviceDiscoveryAgent *m_agent = 0;
     QLowEnergyController *m_controller = 0;
+    QList<QObject*> m_devices;
+    Device* m_connected_device = 0;
+    QList<QObject*> m_services;
     Service* m_connected_service = 0;
+    /* last error */
     ErrorCode m_last_error = NOERROR;
     QString m_error_string;
+    /* local device */
     QBluetoothLocalDevice *m_localdevice = 0;
     bool m_is_poweroff = false;
 };

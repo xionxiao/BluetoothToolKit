@@ -16,7 +16,7 @@
 /**
  * @brief The Service class
  *        Provide common synchronous and asynchronous read/write/notification method of a BLE service
- *        It's better be used by subclassing it and public functionality method to QML
+ *        This class is facility for subclasses to provide user oriented method in QML
  */
 class Service : public QObject
 {

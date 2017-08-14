@@ -38,8 +38,12 @@ void Service::initService(QLowEnergyService* service)
         connect(m_service, SIGNAL(error(QLowEnergyService::ServiceError)),
                 this, SLOT(processServiceError(QLowEnergyService::ServiceError)));
 
+        // TODO:
+        // Check if multiple service can be discovered
         if (m_service->state() != SERVICE_DISCOVERED) {
             m_service->discoverDetails();
+            // TODO:
+            // if it is needed to wait for serviceConnected signal
         }
     }
 }
@@ -170,7 +174,7 @@ bool Service::readSync(QLowEnergyCharacteristic &c, QByteArray &bs, uint timeout
 
 bool Service::writeSync(QLowEnergyCharacteristic &c, QByteArray &bytes, uint timeout, QLowEnergyService::WriteMode mode)
 {
-    m_service->writeCharacteristic(c, bytes, mode);
+    this->write(c, bytes, mode);
     if (waitForEvent(m_service, SIGNAL(characteristicWritten(QLowEnergyCharacteristic,QByteArray)), timeout)) {
         return true;
     } else {
