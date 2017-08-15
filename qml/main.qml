@@ -3,13 +3,15 @@ import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
 import QtQuick.Controls.Material 2.0
 import QtQuick.Dialogs 1.2
+import "./workerscript.js" as WScript
 
 ApplicationWindow {
+    id: app_window
     visible: true
     width: 680
     height: 420
-    title: qsTr("Bluetooth")
-    property var deviceManager: DeviceManager
+    title: qsTr("BluetoothToolbox")
+    property var dm: DeviceManager
 
     Item {
         id: left_panel
@@ -32,7 +34,7 @@ ApplicationWindow {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 210
-            text: qsTr("Bluetooth: " + deviceManager.powerState)
+            text: qsTr("Bluetooth: " + DeviceManager.powerState)
             font.bold: true
         }
 
@@ -52,13 +54,13 @@ ApplicationWindow {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 270
-            text: deviceManager.address
+            text: DeviceManager.address
         }
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 300
-            text: deviceManager.name
+            text: DeviceManager.name
         }
     }
 
@@ -110,6 +112,9 @@ ApplicationWindow {
             height: parent.height - 24
             clip: true
             anchors.top: header.bottom
+
+            ListModel { id: listModel }
+
             delegate: Rectangle {
                 id: delegate_item
                 width: parent.width
@@ -149,21 +154,22 @@ ApplicationWindow {
                         color: highlighted ? "white" : "gray"
                     }
                 }
+
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
                         listView.currentIndex = highlighted ? -1 : index
                         console.log(modelData)
-                        // TODO:
-                        // this function is synchronous, it's better to use WorkerScript
-                        var service = deviceManager.connectToDevice(modelData)
-                        console.log(service.length())
+                        listModel.append({"dm":DeviceManager, "device":modelData})
+                        var msg = {'params': listModel}
+                        console.log(msg)
+                        worker.sendMessage(msg)
                     }
                 }
                 Button {
                     id: download_button
                     /* temporary name filter with boot */
-                    visible: parent.highlighted && modelData.name == "boot"
+                    visible: parent.highlighted //&& modelData.name == "boot"
                     anchors.right: parent.right
                     height: 48
                     width: 48
@@ -183,7 +189,7 @@ ApplicationWindow {
                     }
                 }
             }
-            model: deviceManager.deviceList
+            model: DeviceManager.deviceList
         }
     }
 
@@ -201,7 +207,7 @@ ApplicationWindow {
         enabled: false
         onClicked: {
             busy_indicator.running = true
-            deviceManager.scan()
+            DeviceManager.scan()
         }
     }
 
@@ -228,16 +234,22 @@ ApplicationWindow {
         }
     }
 
+    WorkerScript {
+        id: worker
+        source: "workerscript.js"
+
+    }
+
     Component.onCompleted: {
         refresh_button.enabled = true
-        if (deviceManager.isValid()) {
+        if (DeviceManager.isValid()) {
             busy_indicator.running = true;
-            deviceManager.scan()
+            DeviceManager.scan()
         }
     }
 
     Connections {
-        target: deviceManager
+        target: DeviceManager
         onUpdated: {
             busy_indicator.running = false
         }
