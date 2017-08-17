@@ -115,12 +115,15 @@ ApplicationWindow {
 
             ListModel { id: listModel }
 
+            currentIndex: -1
+
             delegate: Rectangle {
                 id: delegate_item
                 width: parent.width
-                height: 48
+                height: highlighted ? 48*2 : 48
                 color: ListView.isCurrentItem ? Material.color(Material.Blue) : "transparent"
                 property bool highlighted: ListView.isCurrentItem
+                Behavior on height { NumberAnimation { duration: 200 } }
                 Image {
                     width: 48
                     height: 48
@@ -138,7 +141,7 @@ ApplicationWindow {
                     height: 24
                     Text {
                         anchors.bottom: parent.bottom
-                        text: modelData.name
+                        text: modelData.name ? modelData.name : "Unnamed"
                         font.bold: highlighted
                         color: highlighted ? "white" : "black"
                     }
@@ -160,10 +163,10 @@ ApplicationWindow {
                     onClicked: {
                         listView.currentIndex = highlighted ? -1 : index
                         console.log(modelData)
-                        listModel.append({"dm":DeviceManager, "device":modelData})
-                        var msg = {'params': listModel}
-                        console.log(msg)
-                        worker.sendMessage(msg)
+                        //listModel.append({"dm":DeviceManager, "device":modelData})
+                        //var msg = {'params': listModel}
+                        //console.log(msg)
+                        //worker.sendMessage(msg)
                     }
                 }
                 Button {

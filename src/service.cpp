@@ -44,6 +44,7 @@ void Service::initService(QLowEnergyService* service)
             m_service->discoverDetails();
             // TODO:
             // if it is needed to wait for serviceConnected signal
+            waitForEvent(this, SIGNAL(serviceConnected()), 5000);
         }
     }
 }
