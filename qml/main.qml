@@ -112,15 +112,12 @@ ApplicationWindow {
             height: parent.height - 24
             clip: true
             anchors.top: header.bottom
-
-            ListModel { id: listModel }
-
             currentIndex: -1
 
             delegate: Rectangle {
                 id: delegate_item
-                width: parent.width
-                height: highlighted ? 48*2 : 48
+                width: listView.width
+                height: item_services.height + 48
                 color: ListView.isCurrentItem ? Material.color(Material.Blue) : "transparent"
                 property bool highlighted: ListView.isCurrentItem
                 Behavior on height { NumberAnimation { duration: 200 } }
@@ -134,6 +131,7 @@ ApplicationWindow {
                     fillMode: Image.PreserveAspectFit
                 }
                 Item {
+                    id: item_name
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.leftMargin: 48 + 5
@@ -147,7 +145,9 @@ ApplicationWindow {
                     }
                 }
                 Item {
-                    anchors.bottom: parent.bottom
+                    id: item_uuid
+                    anchors.top: item_name.bottom
+                    anchors.topMargin: 5
                     anchors.left: parent.left
                     anchors.leftMargin: 48 + 5
                     height: 24
@@ -157,7 +157,6 @@ ApplicationWindow {
                         color: highlighted ? "white" : "gray"
                     }
                 }
-
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
@@ -169,10 +168,24 @@ ApplicationWindow {
                         //worker.sendMessage(msg)
                     }
                 }
+                ListView {
+                    id: item_services
+                    anchors.top: item_uuid.bottom
+                    width: parent.width
+                    height: highlighted ? contentHeight : 0
+                    model: [1,2,3]
+                    spacing: 5
+                    delegate: Rectangle {
+                        color: "transparent"
+                        width: parent.width
+                        height: highlighted ? 24 : 0
+                    }
+
+                }
                 Button {
                     id: download_button
                     /* temporary name filter with boot */
-                    visible: parent.highlighted //&& modelData.name == "boot"
+                    visible: parent.highlighted && modelData.name == "boot"
                     anchors.right: parent.right
                     height: 48
                     width: 48
@@ -255,6 +268,7 @@ ApplicationWindow {
         target: DeviceManager
         onUpdated: {
             busy_indicator.running = false
+            listView.currentIndex = -1
         }
         onError: {
             console.log(busy_indicator.running)
