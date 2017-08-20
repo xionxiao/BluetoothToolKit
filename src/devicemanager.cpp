@@ -184,8 +184,6 @@ QList<QObject*> DeviceManager::connectToDevice(Device *d)
 
     Log.d() << "Connected " << m_controller->ConnectedState;
     m_connected_device = d;
-    // emit device connect before service create
-    emit deviceConnected();
 
     // discover service
     m_controller->discoverServices();
@@ -211,6 +209,9 @@ QList<QObject*> DeviceManager::connectToDevice(Device *d)
         //connect((Service*)m_connected_service, SIGNAL(serviceConnected()), this, SIGNAL(serviceConnected()));
         m_services.append(m_connected_service);
     }
+
+    // emit device connect before service create
+    emit deviceConnected(m_services);
     return m_services;
 }
 

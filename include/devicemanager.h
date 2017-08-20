@@ -60,7 +60,7 @@ signals:
     /**
      * @brief notify a device is connected
      */
-    void deviceConnected();
+    void deviceConnected(QList<QObject*> services);
 
     /**
      * @brief notify device is disconnected

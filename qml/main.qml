@@ -107,7 +107,7 @@ ApplicationWindow {
         }
 
         ListView {
-            id: listView
+            id: deviceListView
             width: parent.width
             height: parent.height - 24
             clip: true
@@ -116,11 +116,14 @@ ApplicationWindow {
 
             delegate: Rectangle {
                 id: delegate_item
-                width: listView.width
+                width: deviceListView.width
                 height: item_services.height + 48
                 color: ListView.isCurrentItem ? Material.color(Material.Blue) : "transparent"
+                property alias item_services: item_services
                 property bool highlighted: ListView.isCurrentItem
-                Behavior on height { NumberAnimation { duration: 200 } }
+                Behavior on height {
+                    NumberAnimation { duration: 200 }
+                }
                 Image {
                     width: 48
                     height: 48
@@ -157,15 +160,16 @@ ApplicationWindow {
                         color: highlighted ? "white" : "gray"
                     }
                 }
+                ListModel {id:listModel}
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        listView.currentIndex = highlighted ? -1 : index
+                        deviceListView.currentIndex = highlighted ? -1 : index
                         console.log(modelData)
-                        //listModel.append({"dm":DeviceManager, "device":modelData})
-                        //var msg = {'params': listModel}
-                        //console.log(msg)
-                        //worker.sendMessage(msg)
+                        listModel.append({"dm":DeviceManager, "device":modelData})
+                        var msg = {'params': listModel}
+                        console.log(msg)
+                        worker.sendMessage(msg)
                     }
                 }
                 ListView {
@@ -173,12 +177,15 @@ ApplicationWindow {
                     anchors.top: item_uuid.bottom
                     width: parent.width
                     height: highlighted ? contentHeight : 0
-                    model: [1,2,3]
                     spacing: 5
                     delegate: Rectangle {
                         color: "transparent"
                         width: parent.width
                         height: highlighted ? 24 : 0
+                        Text {
+                            anchors.fill: parent
+                            text: modelData.uuid
+                        }
                     }
 
                 }
@@ -253,6 +260,9 @@ ApplicationWindow {
     WorkerScript {
         id: worker
         source: "workerscript.js"
+        onMessage: {
+            console.log(messageObject.reply)
+        }
 
     }
 
@@ -268,12 +278,16 @@ ApplicationWindow {
         target: DeviceManager
         onUpdated: {
             busy_indicator.running = false
-            listView.currentIndex = -1
+            deviceListView.currentIndex = -1
         }
         onError: {
             console.log(busy_indicator.running)
             busy_indicator.running = false
             console.log(errorCode, errorString)
+        }
+        onDeviceConnected: {
+            console.log("connected", services)
+            deviceListView.currentItem.item_services.model = services
         }
     }
 }
