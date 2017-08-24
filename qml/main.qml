@@ -117,7 +117,7 @@ ApplicationWindow {
             delegate: Rectangle {
                 id: delegate_item
                 width: deviceListView.width
-                height: item_services.height + 48
+                height: item_services.height + 48 + 10
                 color: ListView.isCurrentItem ? Material.color(Material.Blue) : "transparent"
                 property alias item_services: item_services
                 property bool highlighted: ListView.isCurrentItem
@@ -148,6 +148,18 @@ ApplicationWindow {
                     }
                 }
                 Item {
+                    id: item_rssi
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    anchors.rightMargin: 48 + 5
+                    height: 24
+                    Text {
+                        anchors.bottom: parent.bottom
+                        text: modelData.rssi
+                        color: "black"
+                    }
+                }
+                Item {
                     id: item_uuid
                     anchors.top: item_name.bottom
                     anchors.topMargin: 5
@@ -160,8 +172,8 @@ ApplicationWindow {
                         color: highlighted ? "white" : "gray"
                     }
                 }
-                ListModel {id:listModel}
                 MouseArea {
+                    ListModel {id:listModel}
                     anchors.fill: parent
                     onClicked: {
                         deviceListView.currentIndex = highlighted ? -1 : index
@@ -177,14 +189,25 @@ ApplicationWindow {
                     anchors.top: item_uuid.bottom
                     width: parent.width
                     height: highlighted ? contentHeight : 0
+                    visible: highlighted
                     spacing: 5
                     delegate: Rectangle {
                         color: "transparent"
                         width: parent.width
-                        height: highlighted ? 24 : 0
+                        height: 24
                         Text {
-                            anchors.fill: parent
-                            text: modelData.uuid
+                            anchors.left: parent.left
+                            anchors.leftMargin: 24
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: modelData.name
+                            color: "white"
+                        }
+                        Rectangle {
+                            anchors.top: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            width: parent.width - 48
+                            height: 1
+                            color: "white"
                         }
                     }
 
