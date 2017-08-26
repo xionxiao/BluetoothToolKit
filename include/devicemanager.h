@@ -2,6 +2,7 @@
 #define DEVICEMANAGER_H
 
 #include <QObject>
+#include <QJSValue>
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <QLowEnergyController>
 #include <QBluetoothLocalDevice>
@@ -112,7 +113,7 @@ public slots:
      *         and lifecycles are managed by DeviceManager not QML js engine
      *         this method is synchronously
      */
-    QList<QObject*> connectToDevice(Device *device);
+    QList<QObject*> connectToDevice(Device *device/*, QJSValue jsCallBack*/);
 
     /**
      * @brief disconnect from device
