@@ -12,6 +12,7 @@ ApplicationWindow {
     height: 420
     title: qsTr("BluetoothToolbox")
     property var dm: DeviceManager
+    property color main_color: Material.color(Material.Blue)
 
     Item {
         id: left_panel
@@ -115,83 +116,96 @@ ApplicationWindow {
             currentIndex: -1
 
             delegate: Rectangle {
+                property alias item_services: item_services
+                property bool highlighted: ListView.isCurrentItem
+
                 id: delegate_item
                 width: deviceListView.width
                 height: item_services.height + 48 + 10
-                color: ListView.isCurrentItem ? Material.color(Material.Blue) : "transparent"
-                property alias item_services: item_services
-                property bool highlighted: ListView.isCurrentItem
+                color: "transparent"
                 Behavior on height {
-                    NumberAnimation { duration: 200 }
+                    NumberAnimation { duration: 250 }
                 }
-                Image {
-                    width: 48
+                Rectangle {
+                    id: item_box
+                    x: 1
+                    width: parent.width - 2
                     height: 48
-                    anchors.verticalCenter: parent.verticalAlignment
-                    anchors.left: parent.left
-                    anchors.leftMargin: 5
-                    source: "Bluetooth.png"
-                    fillMode: Image.PreserveAspectFit
-                }
-                Item {
-                    id: item_name
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    anchors.leftMargin: 48 + 5
-                    width: parent.width
-                    height: 24
-                    Text {
-                        anchors.bottom: parent.bottom
-                        text: modelData.name ? modelData.name : "Unnamed"
-                        font.bold: highlighted
-                        color: highlighted ? "white" : "black"
+                    color: highlighted ? main_color : "transparent"
+                    Image {
+                        width: 48
+                        height: 48
+                        anchors.verticalCenter: parent.verticalAlignment
+                        anchors.left: parent.left
+                        anchors.leftMargin: 5
+                        source: "Bluetooth.png"
+                        fillMode: Image.PreserveAspectFit
                     }
-                }
-                Item {
-                    id: item_rssi
-                    anchors.top: parent.top
-                    anchors.right: parent.right
-                    anchors.rightMargin: 48 + 5
-                    height: 24
-                    Text {
-                        anchors.bottom: parent.bottom
-                        text: modelData.rssi
-                        color: "black"
-                    }
-                }
-                Item {
-                    id: item_uuid
-                    anchors.top: item_name.bottom
-                    anchors.topMargin: 5
-                    anchors.left: parent.left
-                    anchors.leftMargin: 48 + 5
-                    height: 24
-                    Text {
+                    Item {
+                        id: item_name
                         anchors.top: parent.top
-                        text: modelData.uuid.toUpperCase()
-                        color: highlighted ? "white" : "gray"
+                        anchors.left: parent.left
+                        anchors.leftMargin: 48 + 5
+                        width: parent.width
+                        height: 24
+                        Text {
+                            anchors.bottom: parent.bottom
+                            text: modelData.name ? modelData.name : "Unnamed"
+                            font.bold: highlighted
+                            color: highlighted ? "white" : "black"
+                        }
                     }
-                }
-                MouseArea {
-                    ListModel {id:listModel}
-                    anchors.fill: parent
-                    onClicked: {
-                        deviceListView.currentIndex = highlighted ? -1 : index
-                        console.log(modelData)
-                        listModel.append({"dm":DeviceManager, "device":modelData})
-                        var msg = {'params': listModel}
-                        console.log(msg)
-                        worker.sendMessage(msg)
+                    Item {
+                        id: item_rssi
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.rightMargin: 48 + 5
+                        height: 24
+                        Text {
+                            anchors.bottom: parent.bottom
+                            text: modelData.rssi
+                            color: "black"
+                        }
+                    }
+                    Item {
+                        id: item_uuid
+                        anchors.top: item_name.bottom
+                        anchors.topMargin: 5
+                        anchors.left: parent.left
+                        anchors.leftMargin: 48 + 5
+                        height: 24
+                        Text {
+                            anchors.top: parent.top
+                            text: modelData.uuid.toUpperCase()
+                            color: highlighted ? "white" : "gray"
+                        }
+                    }
+                    MouseArea {
+                        ListModel {id:listModel}
+                        anchors.fill: parent
+                        onClicked: {
+                            deviceListView.currentIndex = highlighted ? -1 : index
+                            console.log(modelData)
+                            listModel.append({"dm":DeviceManager, "device":modelData})
+                            var msg = {'params': listModel}
+                            console.log(msg)
+                            worker.sendMessage(msg)
+                        }
                     }
                 }
                 ListView {
                     id: item_services
-                    anchors.top: item_uuid.bottom
+                    anchors.top: item_box.bottom
                     width: parent.width
                     height: highlighted ? contentHeight : 0
                     visible: highlighted
                     spacing: 5
+                    currentIndex: -1
+                    highlight: Rectangle {
+                        color:  main_color
+                    }
                     delegate: Rectangle {
+                        id: wrapper
                         color: "transparent"
                         width: parent.width
                         height: 24
@@ -200,17 +214,22 @@ ApplicationWindow {
                             anchors.leftMargin: 24
                             anchors.verticalCenter: parent.verticalCenter
                             text: modelData.name
-                            color: "white"
+                            color: wrapper.ListView.isCurrentItem ? "white" : Material.color(Material.LightBlue) /*dodgerblue*/
                         }
                         Rectangle {
                             anchors.top: parent.bottom
                             anchors.horizontalCenter: parent.horizontalCenter
                             width: parent.width - 48
                             height: 1
-                            color: "white"
+                            color: wrapper.ListView.isCurrentItem ? "white" : Material.frameColor
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                item_services.currentIndex = index;
+                            }
                         }
                     }
-
                 }
                 Button {
                     id: download_button
@@ -311,6 +330,7 @@ ApplicationWindow {
         onDeviceConnected: {
             console.log("connected", services)
             deviceListView.currentItem.item_services.model = services
+            deviceListView.currentItem.item_services.currentIndex = -1
         }
     }
 }
