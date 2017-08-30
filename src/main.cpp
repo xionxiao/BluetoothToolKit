@@ -1,12 +1,17 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QTranslator>
 #include "devicemanager.h"
 
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
+
+    QTranslator translator;
+    translator.load(":/i18n_zh_CN.qm");
+    app.installTranslator(&translator);
 
     DeviceManager dm;
     QQmlApplicationEngine engine;

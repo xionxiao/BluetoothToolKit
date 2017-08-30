@@ -30,7 +30,7 @@ class DeviceManager : public QObject
     /**
       * @brief host bluetooth power on/off state
       */
-    Q_PROPERTY(QString powerState READ getPowerState NOTIFY powerStateChanged)
+    Q_PROPERTY(bool powerState READ getPowerState NOTIFY powerStateChanged)
 
 public:
     explicit DeviceManager(QObject *parent = 0);
@@ -138,7 +138,7 @@ public slots:
 private slots:
     QString getName();
     QString getAddress();
-    QString getPowerState();
+    bool getPowerState();
     void onScanError(QBluetoothDeviceDiscoveryAgent::Error);
     void onScanFinished();
     void emitError(ErrorCode error_code, QString error_string);

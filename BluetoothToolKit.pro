@@ -12,6 +12,7 @@ SOURCES += \
 
 INCLUDEPATH += include
 RESOURCES += qml/qml.qrc
+TRANSLATIONS = i18n_zh_CN.ts
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =

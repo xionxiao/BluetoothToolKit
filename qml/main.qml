@@ -35,7 +35,7 @@ ApplicationWindow {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 210
-            text: qsTr("Bluetooth: " + DeviceManager.powerState)
+            text: qsTr("Bluetooth: %1").arg(DeviceManager.powerState ? qsTr("On") : qsTr("Off"))
             font.bold: true
         }
 
@@ -86,7 +86,7 @@ ApplicationWindow {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: 10
-                text: "Devices"
+                text: qsTr("Devices")
                 color: "gray"
                 font.bold: true
             }
@@ -150,7 +150,7 @@ ApplicationWindow {
                         height: 24
                         Text {
                             anchors.bottom: parent.bottom
-                            text: modelData.name ? modelData.name : "Unnamed"
+                            text: modelData.name ? modelData.name : qsTr("Unnamed")
                             font.bold: highlighted
                             color: highlighted ? "white" : "black"
                         }
@@ -289,7 +289,7 @@ ApplicationWindow {
 
     FileDialog {
         id: fs
-        title: "Please choose the firmware"
+        title: qsTr("Please choose the firmware")
         folder: shortcuts.home
         onAccepted: {
             console.log("You chose: " + fileUrl)

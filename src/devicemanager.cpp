@@ -58,9 +58,9 @@ QString DeviceManager::getAddress()
     return m_localdevice->isValid() ? m_localdevice->address().toString() : "";
 }
 
-QString DeviceManager::getPowerState()
+bool DeviceManager::getPowerState()
 {
-    return m_is_poweroff ? "Off" : "On";
+    return !m_is_poweroff;
 }
 
 bool DeviceManager::isValid()
