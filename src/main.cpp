@@ -10,8 +10,12 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     QTranslator translator;
-    translator.load(":/i18n_zh_CN.qm");
-    app.installTranslator(&translator);
+    qDebug() << QLocale::system().name();
+    if (QLocale::system().name() == "zh_CN") {
+        qDebug() << QLocale::system().name();
+        translator.load(":/i18n_zh_CN.qm");
+        app.installTranslator(&translator);
+    }
 
     DeviceManager dm;
     QQmlApplicationEngine engine;
