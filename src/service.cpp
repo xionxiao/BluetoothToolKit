@@ -119,10 +119,10 @@ bool Service::readNotificationValueSync(QLowEnergyCharacteristic &c, QByteArray 
             bs = m_notification_data[c.name()];
             return true;
         } else {
-            emitError(CHARACTOR_ERROR, "readNotificationValueSync inValid Charactor");
+            emitError(CHARACTOR_ERROR, tr("readNotificationValueSync inValid Charactor"));
         }
     }
-    emitError(TIMEOUT, "readNotificationValueSync timeout ");
+    emitError(TIMEOUT, tr("readNotificationValueSync timeout "));
     return false;
 }
 
@@ -136,11 +136,11 @@ QByteArray Service::read(QLowEnergyCharacteristic &c)
 void Service::write(QLowEnergyCharacteristic &c, QByteArray &bytes, QLowEnergyService::WriteMode mode)
 {
     if (!this->isValid()) {
-        emitError(SERVICE_ERROR, "service is not valid");
+        emitError(SERVICE_ERROR, tr("service is not valid"));
         return;
     }
     if (!c.isValid()) {
-        emitError(CHARACTOR_ERROR, "write charactor is not valid");
+        emitError(CHARACTOR_ERROR, tr("write charactor is not valid"));
         return;
     }
     m_service->writeCharacteristic(c, bytes, mode);
@@ -150,24 +150,24 @@ void Service::write(QLowEnergyCharacteristic &c, QByteArray &bytes, QLowEnergySe
 bool Service::readSync(QLowEnergyCharacteristic &c, QByteArray &bs, uint timeout)
 {
     if (!this->isValid()) {
-        emitError(SERVICE_ERROR, "service is not valid");
+        emitError(SERVICE_ERROR, tr("service is not valid"));
         return false;
     }
     if(!c.isValid()) {
-        emitError(CHARACTOR_ERROR, "read charactor is not valid");
+        emitError(CHARACTOR_ERROR, tr("read charactor is not valid"));
         return false;
     }
     m_service->readCharacteristic(c);
     if (waitForEvent(m_service, SIGNAL(characteristicRead(QLowEnergyCharacteristic,QByteArray)), timeout)) {
         if(!c.isValid()) {
-            emitError(CHARACTOR_ERROR, "read charactor is not valid");
+            emitError(CHARACTOR_ERROR, tr("read charactor is not valid"));
             return false;
         } else {
             bs = c.value();
             return true;
         }
     } else {
-        emitError(TIMEOUT, "read synchronously timeout" + QString(timeout));
+        emitError(TIMEOUT, tr("read synchronously timeout %1").arg(QString(timeout)));
         return false;
     }
 }
@@ -179,7 +179,7 @@ bool Service::writeSync(QLowEnergyCharacteristic &c, QByteArray &bytes, uint tim
     if (waitForEvent(m_service, SIGNAL(characteristicWritten(QLowEnergyCharacteristic,QByteArray)), timeout)) {
         return true;
     } else {
-        emitError(TIMEOUT, "write synchronously timeout");
+        emitError(TIMEOUT, tr("write synchronously timeout"));
         return false;
     }
 }

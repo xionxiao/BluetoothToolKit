@@ -80,13 +80,13 @@ bool DeviceManager::isValid()
         }
         if (m_localdevice->hostMode() == HOST_POWER_OFF) {
             /* should emit error here? */
-            emitError(POWEROFF, "Device is power off");
+            emitError(POWEROFF, tr("Device is power off"));
             return false;
         }
     }
     /* check support BLE or not */
     if (!(m_agent && m_agent->supportedDiscoveryMethods().testFlag(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod))) {
-        emitError(INVALID, "Bluetooth not support Low Energy Device");
+        emitError(INVALID, tr("Bluetooth not support Low Energy Device"));
         return false;
     }
     return true;
@@ -115,7 +115,7 @@ void DeviceManager::onScanFinished()
 
 void DeviceManager::onScanError(QBluetoothDeviceDiscoveryAgent::Error error)
 {
-    emitError(SCAN_ERROR, "Scan error " + QString(int(error)));
+    emitError(SCAN_ERROR, tr("Scan error %1").arg(QString(int(error))));
 }
 
 void DeviceManager::emitError(ErrorCode error_code, QString error_string)
@@ -164,7 +164,7 @@ QList<QObject*> DeviceManager::connectToDevice(Device *d/*, QJSValue jsCallBack*
     Log.d() << "Connecting";
     QBluetoothDeviceInfo info = d->getInfo();
     if(!info.isValid()) {
-        emitError(CONNECT_ERROR, "device is not valid");
+        emitError(CONNECT_ERROR, tr("device is not valid"));
         return EMPTY_LIST;
     }
 
@@ -178,7 +178,7 @@ QList<QObject*> DeviceManager::connectToDevice(Device *d/*, QJSValue jsCallBack*
         m_controller->disconnectFromDevice();
         delete m_controller;
         m_controller = NULL;
-        emitError(TIMEOUT, "Device connect timeout");
+        emitError(TIMEOUT, tr("Device connect timeout"));
         return EMPTY_LIST;
     }
 
@@ -188,21 +188,21 @@ QList<QObject*> DeviceManager::connectToDevice(Device *d/*, QJSValue jsCallBack*
     // discover service
     m_controller->discoverServices();
     if (!waitForEvent(m_controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), SERVICE_DISCOVERY_TIMEOUT)) {
-        emitError(TIMEOUT, "Service discovery timeout " + QString(SERVICE_DISCOVERY_TIMEOUT));
+        emitError(TIMEOUT, tr("Service discovery timeout %1").arg(QString(SERVICE_DISCOVERY_TIMEOUT)));
         return EMPTY_LIST;
     }
 
     // get service list
     QList<QBluetoothUuid> l = m_controller->services();
     if (l.length() == 0) {
-        emitError(CONNECT_ERROR, "no service found");
+        emitError(CONNECT_ERROR, tr("no service found"));
         return EMPTY_LIST;
     }
 
     for (int i=0; i<l.length(); i++) {
         QLowEnergyService *service = m_controller->createServiceObject(l[i]);
         if (!service) {
-            emitError(CONNECT_ERROR, "service create error");
+            emitError(CONNECT_ERROR, tr("service create error"));
             return EMPTY_LIST;
         }
         m_connected_service = new Service(service);
@@ -226,7 +226,7 @@ void DeviceManager::disconnectFromDevice()
     if (m_controller) {
         m_controller->disconnectFromDevice();
         if (!waitForEvent(m_controller, SIGNAL(disconnected()))) {
-            emitError(TIMEOUT, "Service disconnect timeout");
+            emitError(TIMEOUT, tr("Service disconnect timeout"));
             return;
         }
         delete m_controller;

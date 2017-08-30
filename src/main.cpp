@@ -2,8 +2,6 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QTranslator>
-#include <QLibraryInfo>
-#include <QDir>
 #include "devicemanager.h"
 
 int main(int argc, char *argv[])
