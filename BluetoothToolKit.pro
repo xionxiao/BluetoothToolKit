@@ -8,7 +8,8 @@ SOURCES += \
     src/devicemanager.cpp \
     src/utils.cpp \
     src/service.cpp \
-    src/dfuservice.cpp
+    src/dfuservice.cpp \
+    src/currenttimeservice.cpp
 
 INCLUDEPATH += include
 RESOURCES += qml/qml.qrc
@@ -43,4 +44,5 @@ HEADERS += \
     include/devicemanager.h \
     include/dfuservice.h \
     include/service.h \
-    include/utils.h
+    include/utils.h \
+    include/currenttimeservice.h
