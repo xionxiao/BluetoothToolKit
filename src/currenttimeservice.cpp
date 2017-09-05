@@ -1,5 +1,9 @@
 #include "currenttimeservice.h"
 
+CurrentTimeService::CurrentTimeService(QLowEnergyService *service) : Service(service)
+{
+
+}
 
 QString CurrentTimeService::getCurrentTime()
 {

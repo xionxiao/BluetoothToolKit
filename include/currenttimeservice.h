@@ -10,6 +10,9 @@
 class CurrentTimeService : public Service {
     Q_OBJECT
 
+public :
+    CurrentTimeService(QLowEnergyService *service);
+
 public slots:
     /**
      * @brief getCurrentTime  0x2A2B
@@ -28,7 +31,6 @@ public slots:
      * @return
      */
     QString getReferenceTimeInformation();
-
 };
 
 #endif // CURRENTTIMESERVICE_H
