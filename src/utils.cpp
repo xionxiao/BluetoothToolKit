@@ -4,6 +4,10 @@
 
 utils::LogClass Log;
 
+/* wait for event happen until timeout.
+ * this function blocks the current function and return control to eventloop
+ *
+ */
 bool utils::waitForEvent(const QObject *sender, const char *signal, uint timeout)
 {
     QEventLoop loop;
