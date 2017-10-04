@@ -2,7 +2,6 @@
 
 CurrentTimeService::CurrentTimeService(QLowEnergyService *service) : Service(service)
 {
-
 }
 
 QString CurrentTimeService::getCurrentTime()

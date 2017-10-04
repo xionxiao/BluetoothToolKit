@@ -151,7 +151,7 @@ QObject* DeviceManager::getService()
     return m_connected_service;
 }
 
-QList<QObject*> DeviceManager::connectToDevice(Device *d/*, QJSValue jsCallBack*/)
+QList<QObject*> DeviceManager::connectToDevice(Device *d)
 {
     Log.d() << "Connect to device" << d->name;
     if (!isValid())  return EMPTY_LIST;
@@ -212,11 +212,6 @@ QList<QObject*> DeviceManager::connectToDevice(Device *d/*, QJSValue jsCallBack*
 
     // emit device connect before service create
     emit deviceConnected(m_services);
-    /*
-    if (jsCallBack.isCallable()) {
-        jsCallBack.call();
-    }
-    */
     return m_services;
 }
 
