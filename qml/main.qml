@@ -318,16 +318,18 @@ ApplicationWindow {
 
     Connections {
         target: DeviceManager
-        onUpdated: {
+        function onUpdated() {
+            console.log('onUpdate')
             busy_indicator.running = false
             deviceListView.currentIndex = -1
         }
-        onError: {
+        function onError(err) {
+            console.log(err)
             console.log(busy_indicator.running)
             busy_indicator.running = false
             console.log(errorCode, errorString)
         }
-        onDeviceConnected: {
+        function onDeviceConnected(services) {
             console.log("connected", services)
             deviceListView.currentItem.item_services.model = services
             deviceListView.currentItem.item_services.currentIndex = -1
